@@ -16,124 +16,184 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   bool _isHovering = false;
   DropzoneViewController? drapDropController;
+
+  void _oldFileOpen() {}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Import Test Report"),
+        actions: [
+          Builder(builder: (context) {
+            String hint = "Report History";
+            if (MediaQuery.of(context).size.shortestSide < 600) {
+              return Tooltip(
+                message: hint,
+                child: IconButton(
+                    onPressed: _oldFileOpen, icon: const Icon(Icons.history)),
+              );
+            } else {
+              return TextButton(
+                onPressed: _oldFileOpen,
+                child: Text(
+                  hint,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              );
+            }
+          })
+        ],
       ),
       body: Center(
-        child: Stack(
-          children: [
-            DropzoneView(
-              operation: DragOperation.copy,
-              cursor: CursorType.grab,
-              onCreated: (DropzoneViewController ctrl) =>
-                  drapDropController = ctrl,
-              onHover: () {
-                _updateHovering(true);
-              },
-              onDrop: (dynamic ev) {
-                _updateHovering(false);
-                getDataFromDrag(ev);
-              },
-              onLeave: () {
-                _updateHovering(false);
-              },
-            ),
-            Positioned.fill(
-              child: Align(
-                alignment: Alignment.center,
-                child: Container(
-                  height: 500.h,
-                  width: 500.h,
-                  decoration: BoxDecoration(
-                    color: _isHovering
-                        ? Theme.of(context).primaryColor.withOpacity(0.2)
-                        : null,
-                    border: Border.all(
-                        color: Theme.of(context).primaryColor, width: 10),
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 20.w,
-                    vertical: 20.h,
-                  ),
-                  margin: EdgeInsets.symmetric(
-                    vertical: 20.h,
-                    horizontal: 20.w,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Expanded(
-                        child: FittedBox(
-                          fit: BoxFit.fitHeight,
+        child: SizedBox(
+          height: 600.h,
+          width: 300.w,
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: DropzoneView(
+                  operation: DragOperation.copy,
+                  cursor: CursorType.grab,
+                  onCreated: (DropzoneViewController ctrl) =>
+                      drapDropController = ctrl,
+                  onHover: () {
+                    _updateHovering(true);
+                  },
+                  onDrop: (dynamic ev) {
+                    _updateHovering(false);
+                    getDataFromDrag(ev);
+                  },
+                  onLeave: () {
+                    _updateHovering(false);
+                  },
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: _isHovering
+                      ? Theme.of(context).primaryColor.withOpacity(0.2)
+                      : null,
+                  border: Border.all(
+                      color: Theme.of(context).primaryColor, width: 10),
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 20.w,
+                  vertical: 20.h,
+                ),
+                margin: EdgeInsets.symmetric(
+                  vertical: 20.h,
+                  horizontal: 20.w,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: FittedBox(
+                        fit: BoxFit.fitHeight,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 5.w,
+                            vertical: 5.h,
+                          ),
                           child: Icon(
-                            Icons.image_outlined,
+                            Icons.file_copy_outlined,
                             color: Theme.of(context).primaryColor,
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 20.h,
-                      ),
-                      InkWell(
-                        onTap: () async {
-                          FilePickerResult? result =
-                              await FilePicker.platform.pickFiles();
-                          if (result == null) return;
-                          final value = result.files.first.bytes;
-                          if (value == null) return;
-                          String jsonContent = String.fromCharCodes(value);
-                          final response = json.decode(jsonContent);
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 5.h,
-                            horizontal: 10.w,
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border.all(
+                    ),
+                    SizedBox(
+                      height: 20.h,
+                    ),
+                    InkWell(
+                      onTap: () async {
+                        FilePickerResult? result =
+                            await FilePicker.platform.pickFiles();
+                        if (result == null) return;
+                        final value = result.files.first.bytes;
+                        if (value == null) return;
+                        String jsonContent = String.fromCharCodes(value);
+                        final response = json.decode(jsonContent);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 5.h,
+                          horizontal: 10.w,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                              color: Theme.of(context).primaryColor, width: 3),
+                          borderRadius: BorderRadius.circular(5.r),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Import",
+                              style: TextStyle(
                                 color: Theme.of(context).primaryColor,
-                                width: 3),
-                            borderRadius: BorderRadius.circular(5.r),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                "Import",
-                                style: TextStyle(
-                                  color: Theme.of(context).primaryColor,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                fontWeight: FontWeight.w600,
                               ),
-                              Icon(
-                                Icons.upload,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                            ],
-                          ),
+                            ),
+                            Icon(
+                              Icons.upload,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(
-                        height: 10.h,
-                      ),
-                      Text(
-                        "Or\nDrag And Drop",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                          fontWeight: FontWeight.w500,
+                    ),
+                    SizedBox(
+                      height: 10.h,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            color: Theme.of(context).primaryColor,
+                          ),
                         ),
+                        SizedBox(
+                          width: 2.5.w,
+                        ),
+                        Text(
+                          "Or",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 2.5.w,
+                        ),
+                        Expanded(
+                          child: Divider(
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 10.h,
+                    ),
+                    Text(
+                      "Drag And Drop",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.w500,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

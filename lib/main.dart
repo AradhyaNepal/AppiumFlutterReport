@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
       designSize: const Size(360, 690),
       builder: (BuildContext context, Widget? child) {
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
           title: 'Appium Flutter Report',
           theme: ThemeData(
             primarySwatch: Colors.blue,
