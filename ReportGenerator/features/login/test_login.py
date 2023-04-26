@@ -1,4 +1,5 @@
 from utils.group_and_test import group, test
+from utils.logger import Logger
 
 
 def test_login():

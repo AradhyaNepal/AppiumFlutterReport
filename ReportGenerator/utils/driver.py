@@ -1,17 +1,25 @@
 from imports import *
 from appium import webdriver
 
-capabilities = dict(
-    platformName='Android',
-    automationName='flutter',
-    deviceName='emulator-5554',
-    appPackage='com.mofin.oxpan_mofin',
-    appActivity='.MainActivity',
-    language='en',
-    locale='US',
-)
 
-url = 'http://localhost:4723'
+class DriverSetup:
+    report_path = ""
+    url = 'http://localhost:4723'
+    capabilities = dict(
+        platformName='Android',
+        automationName='flutter',
+        deviceName='emulator-5554',
+        appPackage='com.mofin.oxpan_mofin',
+        appActivity='.MainActivity',
+        language='en',
+        locale='US',
+    )
+    driver = None
 
-report_path = ""
-driver = webdriver.Remote(url, capabilities)
+    @staticmethod
+    def start():
+        DriverSetup.driver = webdriver.Remote(DriverSetup.url, DriverSetup.capabilities)
+
+    @staticmethod
+    def close():
+        DriverSetup.driver.close()

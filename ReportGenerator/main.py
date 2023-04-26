@@ -1,12 +1,12 @@
 from imports import *
-from utils.report_generator import report_generator
 
 
 def main():
+    DriverSetup.start()
     test_login()
     test_crud()
     report_generator.generate_report()
-    driver.close()
+    DriverSetup.close()
 
 
 if __name__ == "__main__":

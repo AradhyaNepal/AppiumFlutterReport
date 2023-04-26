@@ -41,8 +41,14 @@ def delete(logger: Logger):
 
 
 def group_create():
-    create_correct()
-    create_wrong()
+    test(
+        "Create Correct",
+        create_correct,
+    )
+    test(
+        "Create Wrong",
+        create_wrong,
+    )
 
 
 def create_correct():
@@ -58,8 +64,14 @@ def create_wrong():
 
 
 def group_update():
-    update_correct()
-    update_wrong()
+    test(
+        "Update Correct",
+        update_correct,
+    )
+    test(
+        "Update Wrong",
+        update_wrong,
+    )
 
 
 def update_correct():

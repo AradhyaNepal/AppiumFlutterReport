@@ -1,12 +1,14 @@
+from datetime import datetime
+
 class TestCaseData:
     def __init__(self, test_name: str, is_group: bool):
-        self.time: datetime.datetime = datetime.datetime.now()
+        self.time: datetime = datetime.now()
         self.status = Status.NONE
         self.test_name = test_name
         self.steps = []
         self.screenshots = []
         self.is_group = is_group
-        self.children = [] if isGroup else None
+        self.children = [] if is_group else None
         self.invalid_grouping_lock = False
 
     def test_completed(self, extra_log: str, status: str, invalid_grouping: bool = False):
@@ -15,7 +17,7 @@ class TestCaseData:
         self.invalid_grouping_lock = invalid_grouping
         self.extra_log = extra_log
         self.status = status
-        duration = datetime.datetime.now() - self.time
+        duration = datetime.now() - self.time
         self.duration = str(duration.total_seconds() * 1000) + " ms"
 
     def add_step(self, step: str):
@@ -37,7 +39,7 @@ class TestCaseData:
             case Status.NONE:
                 return "None"
 
-    def get_status_from_children(self) -> Status:
+    def get_status_from_children(self):
         if no_need_to_search_children():
             return self.status
         else:
@@ -92,7 +94,7 @@ class TestCaseData:
         return response
 
 
-class Status(Enum):
+class Status():
     SUCCESS = 1
     FAILED = 2
     ERROR = 3
