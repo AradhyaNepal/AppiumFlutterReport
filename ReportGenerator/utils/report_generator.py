@@ -9,7 +9,7 @@ class __FlutterReportGenerator:
     def __init__(self):
         self.time = datetime.now()
         self.testCaseData = []
-        self.bookmark = []
+        self.current_pointer = []
 
     def generate_report(self):
         report_generator_start = datetime.now()

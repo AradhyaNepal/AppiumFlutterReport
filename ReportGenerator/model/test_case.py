@@ -40,7 +40,7 @@ class TestCaseData:
                 return "None"
 
     def get_status_from_children(self):
-        if no_need_to_search_children():
+        if self.no_need_to_search_children():
             return self.status
         else:
             some_test_failed = False
