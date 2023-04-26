@@ -24,9 +24,10 @@ class __FlutterReportGenerator:
         response["generatingReportTime"] = str(report_generation_time.total_seconds() * 1000) + " ms"
 
         # For now no screenshots
-        file_name = DriverSetup.capabilities["platformName"] + "_" + self.time.strftime("%y_%m_%d_%H_%M_%S") + ".json"
+        file_name = DriverSetup.capabilities["automationName"] + "_" + self.time.strftime("%y_%m_%d_%H_%M_%S") + ".json"
+        file_name = file_name.replace(" ", "_")
         file = open(DriverSetup.report_path + file_name, "a")
-        file.write(json.dumps(response,default=str),)
+        file.write(json.dumps(response, default=str), )
         file.close()
 
     def __get_result(self):

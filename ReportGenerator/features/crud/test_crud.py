@@ -1,3 +1,5 @@
+import time
+
 from utils.group_and_test import group, test
 from utils.logger import Logger
 
@@ -75,12 +77,17 @@ def group_update():
 
 
 def update_correct(logger:Logger):
+    time.sleep(0.5)
     logger.add_step("Correct Info Was Added")
     logger.add_step("Update Button Is Pressed")
     assert True
 
 
 def update_wrong(logger:Logger):
+    # group("hello",testABC)
     logger.add_step("Wrong Info Was Added")
     logger.add_step("Update Button Is Pressed")
     assert False
+
+def testABC():
+    print("test")

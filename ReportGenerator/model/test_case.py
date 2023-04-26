@@ -29,8 +29,9 @@ class TestCaseData:
     def add_screenshot(self, screenshot: str):
         self.screenshots.append(screenshot)
 
-    def get_json_status(self) -> str:
-        match self.status:
+    @staticmethod
+    def get_json_status(status: int) -> str:
+        match status:
             case Status.SUCCESS:
                 return "Success"
             case Status.FAILED:
@@ -47,28 +48,18 @@ class TestCaseData:
             return self.status
         else:
             some_test_failed = False
-            all_children_skipped = True
-            all_children_none = True
             for item in self.children:
                 item: TestCaseData = item
                 children_status = item.get_status_from_children()
                 if children_status is Status.ERROR:
                     # First Priority
                     return Status.ERROR
-                if children_status is Status.FAILED:
+                if children_status is Status.ERROR:
                     some_test_failed = some_test_failed or True
-                if children_status is not Status.SKIPPED:
-                    all_children_skipped = all_children_skipped and False
-                if children_status is not Status.NONE:
-                    all_children_none = all_children_none and False
 
             # Returning as per the priority
             if some_test_failed:
                 return Status.FAILED
-            elif all_children_skipped:
-                return Status.SKIPPED
-            elif all_children_none:
-                return Status.NONE
             else:
                 return Status.SUCCESS
 
@@ -78,11 +69,10 @@ class TestCaseData:
         return self.status is Status.SKIPPED or self.is_group is False or len(self.children) == 0
 
     def to_json(self):
-        print("called")
         response = {
-            "time": self.time,
-            "status": self.get_status_from_children(),
             "testName": self.test_name,
+            "time": self.time,
+            "status": TestCaseData.get_json_status(self.get_status_from_children()),
             "extraLog": self.extra_log,
             "duration": self.duration,
             "steps": self.steps,
@@ -98,7 +88,7 @@ class TestCaseData:
         return response
 
 
-class Status():
+class Status:
     SUCCESS = 1
     FAILED = 2
     ERROR = 3

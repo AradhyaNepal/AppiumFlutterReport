@@ -36,8 +36,12 @@ def __create_test_case(title: str, testing, is_group: bool, skip: bool = False):
             parent_depth = parent_depth + 1
         parent_data: TestCaseData = temp
         if parent_data.is_group is not True or parent_data.children is None:
+            warning = "Warning: Group or Another Test '" + title + "' :cannot Be added inside Test, Skipped all the " \
+                                                                   "testing in " \
+                                                 "particular Test scope"
+            print(warning)
             parent_data.test_completed(
-                "Group '" + title + "' :cannot Be added inside Test, Skipped all the testing in particular Test scope",
+                warning,
                 Status.FAILED, invalid_grouping=True)
             return
     test_case = TestCaseData(title, is_group=is_group)
