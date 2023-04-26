@@ -8,6 +8,8 @@ class __FlutterReportGenerator:
 
     def __init__(self):
         self.time = datetime.now()
+        # Todo: Implement Inside Test Cannot be Group or Test
+        self.pointer_is_group = None
         self.testCaseData = []
         self.current_pointer = []
 

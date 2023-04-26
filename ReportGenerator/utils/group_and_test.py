@@ -5,14 +5,17 @@ import traceback
 
 
 def group(title: str, function_with_no_parameter, skip: bool = False):
-    __create_test_case(title=title, testing=function_with_no_parameter, is_group=True, skip=skip)
+    __create_test_case(title=title, testing=function_with_no_parameter, is_group=True,
+                       skip=skip)
 
 
 def test(title: str, function_with_logger_as_parameter, skip: bool = False):
-    __create_test_case(title=title, testing=function_with_logger_as_parameter, is_group=False, skip=skip)
+    __create_test_case(title=title, testing=function_with_logger_as_parameter, is_group=False,
+                       skip=skip)
 
 
 def __create_test_case(title: str, testing, is_group: bool, skip: bool = False):
+    # Todo: Implement Skip
     parent_data = TestCaseData("", is_group=False)
     root_element_with_no_parent = False
     if len(report_generator.current_pointer) == 0:
@@ -35,10 +38,11 @@ def __create_test_case(title: str, testing, is_group: bool, skip: bool = False):
                 temp = temp.children[index]
             parent_depth = parent_depth + 1
         parent_data: TestCaseData = temp
-        if parent_data.is_group is not True or parent_data.children is None:
+        if False:
+            # Todo: Implement Inside Test Cannot be Group or Test
             warning = "Warning: Group or Another Test '" + title + "' :cannot Be added inside Test, Skipped all the " \
                                                                    "testing in " \
-                                                 "particular Test scope"
+                                                                   "particular Test scope"
             print(warning)
             parent_data.test_completed(
                 warning,
@@ -51,6 +55,7 @@ def __create_test_case(title: str, testing, is_group: bool, skip: bool = False):
         parent_data.children.append(test_case)
     if skip:
         test_case.test_completed("-", Status.SKIPPED)
+        return
     try:
         # Run The Testing
         if is_group:

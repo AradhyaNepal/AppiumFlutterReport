@@ -14,7 +14,7 @@ def test_crud():
 def group_crud():
     group(
         "Create",
-        group_create
+        group_create,
     )
     test(
         "Testing Read",
@@ -31,6 +31,10 @@ def group_crud():
 
 
 def read(logger: Logger):
+    group(
+        "Delete: Must Throw test must not be inside test",
+        delete2,
+    )
     logger.add_step("Read Button Was Pressed")
     logger.add_step("Yes I want to read it any how was pressed")
     assert False
@@ -39,6 +43,9 @@ def read(logger: Logger):
 def delete(logger: Logger):
     logger.add_step("Delete Button Was Pressed")
     logger.add_step("Confirm To Delete Was Pressed")
+    assert True
+
+def delete2():
     assert True
 
 

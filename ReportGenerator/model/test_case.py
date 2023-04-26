@@ -13,7 +13,7 @@ class TestCaseData:
         self.invalid_grouping_lock = False
         self.extra_log = "N/A"
 
-    def test_completed(self, extra_log: str, status: str, invalid_grouping: bool = False):
+    def test_completed(self, extra_log: str, status: int, invalid_grouping: bool = False):
         if self.invalid_grouping_lock is True:
             print("Locked Protection")
             return
