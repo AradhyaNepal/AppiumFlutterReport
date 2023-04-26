@@ -11,11 +11,11 @@ def test_login():
 def group_login():
     test(
         "Wrong Login",
-        correct_login,
+        wrong_login,
     )
     test(
         "Correct Login",
-        wrong_login,
+        correct_login,
     )
 
 

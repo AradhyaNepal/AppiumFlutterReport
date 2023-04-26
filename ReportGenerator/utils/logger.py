@@ -7,8 +7,8 @@ class Logger:
     def __init__(self, data: TestCaseData):
         self.__privateData = data
 
-    def add_step(self, step: String):
+    def add_step(self, step: str):
         self.__privateData.add_step(step)
 
-    def add_screenshot(self, screenshot: String):
+    def add_screenshot(self, screenshot: str):
         self.__privateData.add_screenshot(screenshot)

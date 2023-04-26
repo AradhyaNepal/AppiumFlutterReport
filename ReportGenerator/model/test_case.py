@@ -1,27 +1,27 @@
 class TestCaseData:
     def __init__(self, test_name: str, is_group: bool):
-        self.time = datetime.datetime.now()
-        # Success, Failed, Error
+        self.time: datetime.datetime = datetime.datetime.now()
         self.status = Status.NONE
         self.test_name = test_name
         self.steps = []
         self.screenshots = []
         self.is_group = is_group
         self.children = [] if isGroup else None
-        self.invalid_grouping = False
+        self.invalid_grouping_lock = False
 
-    def test_completed(self, extra_log: String, status: str, invalid_grouping: bool = False):
-        if self.invalid_grouping is True and self.is_group is not True:
+    def test_completed(self, extra_log: str, status: str, invalid_grouping: bool = False):
+        if self.invalid_grouping_lock is True:
             return
-        self.invalid_grouping = invalid_grouping
-        self.duration = datetime.datetime.now() - self.time
+        self.invalid_grouping_lock = invalid_grouping
         self.extra_log = extra_log
         self.status = status
+        duration = datetime.datetime.now() - self.time
+        self.duration = str(duration.total_seconds() * 1000) + " ms"
 
-    def add_step(self, step: String):
+    def add_step(self, step: str):
         self.steps.append(step)
 
-    def add_screenshot(self, screenshot: String):
+    def add_screenshot(self, screenshot: str):
         self.screenshots.append(screenshot)
 
     def get_json_status(self) -> str:
@@ -41,7 +41,7 @@ class TestCaseData:
         if no_need_to_search_children():
             return self.status
         else:
-            have_failed_too = False
+            some_test_failed = False
             all_children_skipped = True
             all_children_none = True
             for item in self.children:
@@ -51,14 +51,14 @@ class TestCaseData:
                     # First Priority
                     return Status.ERROR
                 if children_status is Status.FAILED:
-                    have_failed_too = have_failed_too or True
+                    some_test_failed = some_test_failed or True
                 if children_status is not Status.SKIPPED:
                     all_children_skipped = all_children_skipped and False
                 if children_status is not Status.NONE:
                     all_children_none = all_children_none and False
 
             # Returning as per the priority
-            if have_failed_too:
+            if some_test_failed:
                 return Status.FAILED
             elif all_children_skipped:
                 return Status.SKIPPED
@@ -71,6 +71,25 @@ class TestCaseData:
         if self.children is None:
             return True
         return self.status is Status.SKIPPED or self.is_group is False or len(self.children) is False
+
+    def to_json(self):
+        response = {
+            "time": self.time,
+            "status": self.get_status_from_children(),
+            "testName": self.test_name,
+            "extraLog": self.extra_log,
+            "duration": self.duration,
+            "steps": self.steps,
+            "screenshots": self.screenshots,
+        }
+        if self.is_group is True or self.children is not None:
+            children_json = []
+            for item in self.children:
+                item: TestCaseData = item
+                children_json.append(item.to_json())
+            response["children"] = children_json
+
+        return response
 
 
 class Status(Enum):
