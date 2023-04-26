@@ -72,9 +72,10 @@ class TestCaseData:
     def no_need_to_search_children(self) -> bool:
         if self.children is None:
             return True
-        return self.status is Status.SKIPPED or self.is_group is False or len(self.children) is False
+        return self.status is Status.SKIPPED or self.is_group is False or len(self.children) == 0
 
     def to_json(self):
+        print("called")
         response = {
             "time": self.time,
             "status": self.get_status_from_children(),

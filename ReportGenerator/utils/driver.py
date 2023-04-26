@@ -14,12 +14,13 @@ class DriverSetup:
         language='en',
         locale='US',
     )
-    driver = None
+
+    driver: webdriver.Remote
 
     @staticmethod
-    def start():
+    def setup():
         DriverSetup.driver = webdriver.Remote(DriverSetup.url, DriverSetup.capabilities)
 
     @staticmethod
     def close():
-        DriverSetup.driver.close()
+        DriverSetup.driver.quit()

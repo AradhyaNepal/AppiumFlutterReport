@@ -2,7 +2,7 @@ from imports import *
 
 
 def main():
-    DriverSetup.start()
+    DriverSetup.setup()
     test_login()
     test_crud()
     report_generator.generate_report()
