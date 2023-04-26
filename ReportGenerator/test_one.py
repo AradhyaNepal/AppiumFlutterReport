@@ -1,6 +1,6 @@
 import allure
 import pytest
-from driver import driver
+from capabilities_and_url import driver
 
 
 def test_one():

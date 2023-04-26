@@ -1,4 +1,5 @@
 import datetime
+from capabilities_and_url import capabilities
 
 
 class FlutterReportGenerator:
