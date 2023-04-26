@@ -58,19 +58,21 @@ def __create_test_case(title: str, testing, is_group: bool, skip: bool = False):
         if is_group:
             report_generator.current_pointer.append(0)
             testing()
-            last_index = report_generator.current_pointer.pop() - 1
-            report_generator.current_pointer[last_index] = report_generator.current_pointer[last_index] + 1
-
         else:
             logger = Logger(test_case)
             testing(logger)
-            last_count = len(report_generator.current_pointer) - 1
-            report_generator.current_pointer[last_count] = report_generator.current_pointer[last_count] + 1
-
     except AssertionError:
         test_case.test_completed("_", Status.FAILED)
     except Exception as e:
         print(str(e))
         print(traceback.format_exc())
         test_case.test_completed(str(e), Status.ERROR)
+    finally:
+        if is_group:
+            last_index = report_generator.current_pointer.pop() - 1
+            report_generator.current_pointer[last_index] = report_generator.current_pointer[last_index] + 1
+        else:
+            last_index = len(report_generator.current_pointer) - 1
+            report_generator.current_pointer[last_index] = report_generator.current_pointer[last_index] + 1
+
     print(title + " Test Completed. Now Next" + str(report_generator.current_pointer))

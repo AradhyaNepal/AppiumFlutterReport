@@ -51,13 +51,13 @@ def group_create():
     )
 
 
-def create_correct():
+def create_correct(logger:Logger):
     logger.add_step("Correct Info Was Added")
     logger.add_step("Create Button Is Pressed")
     assert False
 
 
-def create_wrong():
+def create_wrong(logger:Logger):
     logger.add_step("Wrong Info Was Added")
     logger.add_step("Create Button Is Pressed")
     assert True
@@ -74,13 +74,13 @@ def group_update():
     )
 
 
-def update_correct():
+def update_correct(logger:Logger):
     logger.add_step("Correct Info Was Added")
     logger.add_step("Update Button Is Pressed")
     assert True
 
 
-def update_wrong():
+def update_wrong(logger:Logger):
     logger.add_step("Wrong Info Was Added")
     logger.add_step("Update Button Is Pressed")
     assert False
