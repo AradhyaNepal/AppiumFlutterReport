@@ -1,5 +1,6 @@
 from datetime import datetime
 
+
 class TestCaseData:
     def __init__(self, test_name: str, is_group: bool):
         self.time: datetime = datetime.now()
@@ -10,9 +11,11 @@ class TestCaseData:
         self.is_group = is_group
         self.children = [] if is_group else None
         self.invalid_grouping_lock = False
+        self.extra_log = "N/A"
 
     def test_completed(self, extra_log: str, status: str, invalid_grouping: bool = False):
         if self.invalid_grouping_lock is True:
+            print("Locked Protection")
             return
         self.invalid_grouping_lock = invalid_grouping
         self.extra_log = extra_log
@@ -49,7 +52,7 @@ class TestCaseData:
             for item in self.children:
                 item: TestCaseData = item
                 children_status = item.get_status_from_children()
-                if children_statusis is Status.ERROR:
+                if children_status is Status.ERROR:
                     # First Priority
                     return Status.ERROR
                 if children_status is Status.FAILED:
