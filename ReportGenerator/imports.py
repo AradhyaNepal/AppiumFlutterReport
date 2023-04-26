@@ -1,4 +1,2 @@
-from test_crud import *
-from test_two import *
-from test_three import *
-from safe_test import *
+from features.crud.test_crud import test_crud
+from features.login.test_login import test_login

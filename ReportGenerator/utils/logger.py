@@ -1,4 +1,4 @@
-from test_case import TestCaseData
+from model.test_case import TestCaseData
 
 
 # Logger is available to user. It ensure that user can add details to TestCaseData's Object

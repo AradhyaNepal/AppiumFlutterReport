@@ -1,8 +1,5 @@
-import allure
-import pytest
-from driver import driver
-from group_and_test import group, test
-from logger import Logger
+from utils.group_and_test import group, test
+from utils.logger import Logger
 
 
 def test_crud():

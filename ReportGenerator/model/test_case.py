@@ -2,7 +2,7 @@ class TestCaseData:
     def __init__(self, test_name: str, is_group: bool):
         self.time = datetime.datetime.now()
         # Success, Failed, Error
-        self.status = None
+        self.status = Status.NONE
         self.test_name = test_name
         self.steps = []
         self.screenshots = []
@@ -23,3 +23,11 @@ class TestCaseData:
 
     def add_screenshot(self, screenshot: String):
         self.screenshots.append(screenshot)
+
+
+class Status(Enum):
+    SUCCESS = 1
+    FAILED = 2
+    ERROR = 3
+    SKIPPED = 4
+    NONE = 5
