@@ -1,8 +1,8 @@
 import allure
 import pytest
-from appium import webdriver
+from driver import driver
 
 
-def test_one(driver: webdriver.Remote):
+def test_one():
     assert True
 

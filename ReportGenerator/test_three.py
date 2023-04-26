@@ -1,5 +1,5 @@
 from appium import webdriver
 
 
-def test_three(driver: webdriver.Remote):
+def test_three():
     assert False
