@@ -1,5 +1,5 @@
 import datetime
-from capabilities_and_url import capabilities
+from driver import capabilities
 
 
 class FlutterReportGenerator:
@@ -14,5 +14,5 @@ class FlutterReportGenerator:
         duration = datetime.datetime.now()-self.time
 
 
-
+report_generator = FlutterReportGenerator(capabilities)
 

@@ -1,5 +1,5 @@
 from imports import *
-
+from appium import webdriver
 
 capabilities=dict(
         platformName='Android',
@@ -12,4 +12,4 @@ capabilities=dict(
     )
 
 url='http://localhost:4723'
-
+driver = webdriver.Remote(url, capabilities)
