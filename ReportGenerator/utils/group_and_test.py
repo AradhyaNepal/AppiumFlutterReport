@@ -12,7 +12,7 @@ def test(title: str, testing: function(Logger), skip: bool = False):
 
 
 def __create_test_case(title: str, testing, is_group: bool, skip: bool = False):
-    if report_generator.bookmark.count() is 0:
+    if len(report_generator.bookmark) is False:
         report_generator.bookmark.append(0)
 
     temp = None

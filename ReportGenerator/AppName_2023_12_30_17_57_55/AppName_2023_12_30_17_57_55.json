@@ -14,7 +14,7 @@
     {
       "time": "2023/12/30 17:58:55",
       "duration": "20ms",
-      "status": false,
+      "status": "Success",
       "testName": "Login Test",
       "extraLog": "TypeCase Error: String cannot be casted To integer. And other Stack Details",
       "steps": [
@@ -25,12 +25,12 @@
         "/screenshots/photo1.png",
         "/screenshots/photo2.png"
       ],
-      "children": []
+      "children": null
     },
     {
       "time": "2023/12/30 17:59:55",
       "duration": "40ms",
-      "status": false,
+      "status": "Success",
       "testName": "Item CRUD",
       "extraLog": "",
       "steps": "",
@@ -39,7 +39,7 @@
         {
           "time": "2023/12/30 17:59:55",
           "duration": "20ms",
-          "status": true,
+          "status": "Success",
           "testName": "Adding Item",
           "extraLog": "",
           "steps": "",
@@ -48,7 +48,7 @@
             {
               "time": "2023/12/30 17:59:55",
               "duration": "10ms",
-              "status": true,
+              "status": "Failed",
               "testName": "Correct Value Adding",
               "extraLog": "",
               "steps": [
@@ -59,12 +59,12 @@
                 "/screenshots/photo3.png",
                 "/screenshots/photo4.png"
               ],
-              "children": []
+              "children": null
             },
             {
               "time": "2023/12/30 17:59:56",
               "duration": "10ms",
-              "status": true,
+              "status": "Failed",
               "testName": "Wrong Value Adding To Test Validation",
               "extraLog": "TypeCase Error: String cannot be casted To integer. And other Stack Details",
               "steps": [
@@ -73,14 +73,14 @@
                 "Proper validation was checked"
               ],
               "screenshots": [],
-              "children": []
+              "children": null
             }
           ]
         },
         {
           "time": "2023/12/30 17:59:57",
           "duration": "20ms",
-          "status": false,
+          "status": "Error",
           "testName": "Deleting Item",
           "extraLog": "TypeCase Error: String cannot be casted To integer. And other Stack Details",
           "steps": [
@@ -91,7 +91,7 @@
             "/screenshots/photo5.png",
             "/screenshots/photo6.png"
           ],
-          "children": []
+          "children": null
         }
       ]
     }
