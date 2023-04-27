@@ -7,10 +7,10 @@ import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../common/widgets/app_bar_title_widget.dart';
+import '../../model/report.dart';
+import '../report_details/report_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  static const String route = "/";
-
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     onDrop: (dynamic ev) {
                       _updateHovering(false);
-                      getDataFromDrag(ev);
+                      _getDataFromDragAndDrop(ev);
                     },
                     onLeave: () {
                       _updateHovering(false);
@@ -136,15 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: 20.h,
                     ),
                     InkWell(
-                      onTap: () async {
-                        FilePickerResult? result =
-                            await FilePicker.platform.pickFiles();
-                        if (result == null) return;
-                        final value = result.files.first.bytes;
-                        if (value == null) return;
-                        String jsonContent = String.fromCharCodes(value);
-                        final response = json.decode(jsonContent);
-                      },
+                      onTap: _getDataFromImport,
                       child: Container(
                         padding: EdgeInsets.symmetric(
                           vertical: 5.h,
@@ -227,11 +219,62 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void getDataFromDrag(dynamic htmlData) async {
-    if (drapDropController == null) return;
-    final value = await drapDropController!.getFileData(htmlData);
-    String jsonContent = String.fromCharCodes(value);
-    final response = json.decode(jsonContent);
+  void _getDataFromDragAndDrop(dynamic htmlData) async {
+    _errorSafeImport(() async {
+      if (drapDropController == null) return;
+      final value = await drapDropController!.getFileData(htmlData);
+      _openReportScreen(value);
+    });
+  }
+
+  void _getDataFromImport() async {
+    _errorSafeImport(() async {
+      FilePickerResult? result = await FilePicker.platform.pickFiles();
+      if (result == null) return;
+      final value = result.files.first.bytes;
+      _openReportScreen(value);
+    });
+  }
+
+  void _errorSafeImport(Function function) {
+    try {
+      function();
+    } catch (e, s) {
+      if (kDebugMode) {
+        print(e);
+        print(s);
+      }
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Error"),
+            content: const Text("Cannot load. May be file is wrong formatted"),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Okay"))
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void _openReportScreen(Uint8List? value) {
+    _errorSafeImport(() {
+      if (value == null) return;
+      String jsonContent = String.fromCharCodes(value);
+      final response = json.decode(jsonContent);
+      final report = Report.fromJson(response);
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => ReportDetailsScreen(
+          report: report,
+        ),
+      ));
+    });
   }
 
   void _updateHovering(bool value) {

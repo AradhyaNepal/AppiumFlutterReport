@@ -25,14 +25,30 @@ class TestCase {
     return TestCase(
       testName: map["testName"],
       time: map["time"],
-      status: map["status"],
+      status: _getStatus(map["status"]),
       extraLog: map["extraLog"],
       duration: map["duration"],
-      steps: map["steps"],
-      screenshots: map["screenshots"],
+      steps: (map["steps"] as List).map((e) => e.toString()).toList(),
+      screenshots:
+          (map["screenshots"] as List).map((e) => e.toString()).toList(),
       children: map["children"] == null
           ? null
           : (map["children"] as List).map((e) => TestCase.fromJson(e)).toList(),
     );
+  }
+
+  static Status _getStatus(String serverValue) {
+    switch (serverValue) {
+      case "Success":
+        return Status.success;
+      case "Failed":
+        return Status.failed;
+      case "Error":
+        return Status.error;
+      case "Skipped":
+        return Status.skipped;
+      default:
+        return Status.none;
+    }
   }
 }
