@@ -10,12 +10,36 @@ class Report {
   String duration;
   String generatingReportTime;
 
-  List<TestResultData> finalCalculatedData = [
-    TestResultData(status: Status.success, forGroup: 10, forTestCase: 1),
-    TestResultData(status: Status.failed, forGroup: 9, forTestCase: 2),
-    TestResultData(status: Status.error, forGroup: 8, forTestCase: 3),
-    TestResultData(status: Status.skipped, forGroup: 7, forTestCase: 4),
-    TestResultData(status: Status.none, forGroup: 6, forTestCase: 5),
+  bool _finalDataCalculated = false;
+
+  List<TestResultData> get finalCalculatedData {
+    if (_finalDataCalculated) return _finalCalculatedData;
+    _fetchFinalCalculatedData(result);
+    return _finalCalculatedData;
+  }
+
+  void _fetchFinalCalculatedData(List<TestCase> parentTestCaseList) {
+    for (final childTestCase in parentTestCaseList) {
+      for (int i = 0; i < _finalCalculatedData.length; i++) {
+        if (childTestCase.status == _finalCalculatedData[i].status) {
+          if (childTestCase.children == null) {
+            _finalCalculatedData[i].forTestCase++;
+          } else {
+            _finalCalculatedData[i].forGroup++;
+            _fetchFinalCalculatedData(childTestCase.children ?? []);
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  final List<TestResultData> _finalCalculatedData = [
+    TestResultData(status: Status.success, forGroup: 0, forTestCase: 0),
+    TestResultData(status: Status.failed, forGroup: 0, forTestCase: 0),
+    TestResultData(status: Status.error, forGroup: 0, forTestCase: 0),
+    TestResultData(status: Status.skipped, forGroup: 0, forTestCase: 0),
+    TestResultData(status: Status.none, forGroup: 0, forTestCase: 0),
   ];
 
   Report({
@@ -29,12 +53,12 @@ class Report {
 
   factory Report.fromJson(Map<String, dynamic> map) {
     return Report(
-        time: map["time"],
-        appName: map["appName"],
-        capabilities: Capabilities.fromJson(map["capabilities"]),
-        result:
-            (map["result"] as List).map((e) => TestCase.fromJson(e)).toList(),
-        duration: map["duration"],
-        generatingReportTime: map["generatingReportTime"]);
+      time: map["time"],
+      appName: map["appName"],
+      capabilities: Capabilities.fromJson(map["capabilities"]),
+      result: (map["result"] as List).map((e) => TestCase.fromJson(e)).toList(),
+      duration: map["duration"],
+      generatingReportTime: map["generatingReportTime"],
+    );
   }
 }
