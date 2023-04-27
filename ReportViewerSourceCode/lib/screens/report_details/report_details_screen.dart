@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../common/widgets/app_bar_title_widget.dart';
 import '../../model/report.dart';
@@ -20,14 +21,25 @@ class ReportDetailsScreen extends StatelessWidget {
           title: "Report of: ${report.appName}",
         ),
       ),
-      body: Column(
-        children: [
-          CapabilitiesAndDetailsWidget(
-            report: report,
+      body: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: 10.w,
+        ),
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            children: [
+              SizedBox(
+                height: 20.h,
+              ),
+              CapabilitiesAndDetailsWidget(
+                report: report,
+              ),
+              TestResultWidget(),
+              TestCaseTableWidget(),
+            ],
           ),
-          TestResultWidget(),
-          TestCaseTableWidget(),
-        ],
+        ),
       ),
     );
   }

@@ -18,7 +18,7 @@ class AppBarTitleWidget extends StatelessWidget {
           title,
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            fontSize: isBig(context) ? 18.sp : 7.sp,
+            fontSize: isSmall(context) ? 18.sp : 7.sp,
           ),
         ),
       ),
