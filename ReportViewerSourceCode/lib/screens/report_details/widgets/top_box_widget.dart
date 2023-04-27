@@ -1,24 +1,33 @@
-import 'package:appium_report/screens/report_details/widgets/top_box_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../model/capabilities.dart';
+class TopBoxWidgetData {
+  String heading;
+  String value;
 
-class CapabilitiesWidget extends StatefulWidget {
+  TopBoxWidgetData({
+    required this.heading,
+    required this.value,
+  });
+}
+
+class TopBoxWidget extends StatefulWidget {
   final bool forSmallDevice;
-  final Capabilities capabilities;
+  final List<TopBoxWidgetData> topBoxDataList;
+  final String heading;
 
-  const CapabilitiesWidget({
-    required this.capabilities,
+  const TopBoxWidget({
+    required this.topBoxDataList,
     required this.forSmallDevice,
+    required this.heading,
     Key? key,
   }) : super(key: key);
 
   @override
-  State<CapabilitiesWidget> createState() => _CapabilitiesWidgetState();
+  State<TopBoxWidget> createState() => _TopBoxWidgetState();
 }
 
-class _CapabilitiesWidgetState extends State<CapabilitiesWidget> {
+class _TopBoxWidgetState extends State<TopBoxWidget> {
   bool isExpanded = false;
 
   @override
@@ -29,22 +38,6 @@ class _CapabilitiesWidgetState extends State<CapabilitiesWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return TopBoxWidget(
-      topBoxDataList: [
-        TopBoxWidgetData(
-            heading: "Automation", value: widget.capabilities.automationName),
-        TopBoxWidgetData(
-            heading: "Platform", value: widget.capabilities.platformName),
-        TopBoxWidgetData(
-            heading: "Device", value: widget.capabilities.deviceName),
-        TopBoxWidgetData(
-            heading: "Package", value: widget.capabilities.appPackage),
-        TopBoxWidgetData(
-            heading: "Activity", value: widget.capabilities.appActivity),
-      ],
-      forSmallDevice: widget.forSmallDevice,
-      heading: 'Capabilities',
-    );
     return AnimatedSize(
       alignment: Alignment.topCenter,
       duration: const Duration(milliseconds: 500),
@@ -61,7 +54,7 @@ class _CapabilitiesWidgetState extends State<CapabilitiesWidget> {
                 });
               },
               child: HeadingWidget(
-                heading: "Capabilities",
+                heading: widget.heading,
                 isExpanded: isExpanded,
                 isSmallScreen: widget.forSmallDevice,
               ),
@@ -80,7 +73,13 @@ class _CapabilitiesWidgetState extends State<CapabilitiesWidget> {
                   horizontal: 5.w,
                 ),
                 child: Column(
-                  children: [],
+                  children: [
+                    for (TopBoxWidgetData value in widget.topBoxDataList)
+                      SingleDetailItem(
+                        heading: value.heading,
+                        value: value.value,
+                      ),
+                  ],
                 ),
               ),
           ],

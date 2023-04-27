@@ -4,11 +4,11 @@ import '../../../model/report.dart';
 
 class DetailsWidget extends StatelessWidget {
   final Report report;
-  final bool screenIsBig;
+  final bool forSmallDevice;
 
   const DetailsWidget({
     required this.report,
-    required this.screenIsBig,
+    required this.forSmallDevice,
     Key? key,
   }) : super(key: key);
 

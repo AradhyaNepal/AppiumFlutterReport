@@ -16,15 +16,31 @@ class CapabilitiesAndDetailsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool screenIsBig = !isSmall(context);
-    if (screenIsBig) {
+    bool screenIsSmall = isSmall(context);
+    if (screenIsSmall) {
+      return Column(
+        children: [
+          DetailsWidget(
+            report: report,
+            forSmallDevice: screenIsSmall,
+          ),
+          SizedBox(
+            height: 10.h,
+          ),
+          CapabilitiesWidget(
+            capabilities: report.capabilities,
+            forSmallDevice: screenIsSmall,
+          ),
+        ],
+      );
+    } else {
       return IntrinsicHeight(
         child: Row(
           children: [
             Expanded(
               child: DetailsWidget(
                 report: report,
-                screenIsBig: screenIsBig,
+                forSmallDevice: screenIsSmall,
               ),
             ),
             SizedBox(
@@ -32,28 +48,12 @@ class CapabilitiesAndDetailsWidget extends StatelessWidget {
             ),
             Expanded(
               child: CapabilitiesWidget(
-                report: report,
-                forSmallDevice: screenIsBig,
+                capabilities: report.capabilities,
+                forSmallDevice: screenIsSmall,
               ),
             ),
           ],
         ),
-      );
-    } else {
-      return Column(
-        children: [
-          DetailsWidget(
-            report: report,
-            screenIsBig: screenIsBig,
-          ),
-          SizedBox(
-            height: 10.h,
-          ),
-          CapabilitiesWidget(
-            report: report,
-            forSmallDevice: screenIsBig,
-          ),
-        ],
       );
     }
   }

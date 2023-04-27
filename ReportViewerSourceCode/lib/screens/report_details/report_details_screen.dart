@@ -8,7 +8,6 @@ import 'widgets/test_case_result_widget.dart';
 import 'widgets/test_case_table_widget.dart';
 
 class ReportDetailsScreen extends StatelessWidget {
-  static const String route = "/ReportDetailsScreen";
   final Report report;
 
   const ReportDetailsScreen({required this.report, Key? key}) : super(key: key);
@@ -18,7 +17,7 @@ class ReportDetailsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: AppBarTitleWidget(
-          title: "Report of: ${report.appName}",
+          title: "${report.appName} Report",
         ),
       ),
       body: Padding(
@@ -35,8 +34,8 @@ class ReportDetailsScreen extends StatelessWidget {
               CapabilitiesAndDetailsWidget(
                 report: report,
               ),
-              TestResultWidget(),
-              TestCaseTableWidget(),
+              const TestResultWidget(),
+              const TestCaseTableWidget(),
             ],
           ),
         ),
