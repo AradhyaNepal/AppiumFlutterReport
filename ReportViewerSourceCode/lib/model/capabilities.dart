@@ -24,8 +24,8 @@ class Capabilities {
       deviceName: map["deviceName"],
       appPackage: map["appPackage"],
       appActivity: map["appActivity"],
-      language: map["language"],
-      locale: map["locale"],
+      language: map["language"] ?? "eng",
+      locale: map["locale"] ?? "eng",
     );
   }
 }

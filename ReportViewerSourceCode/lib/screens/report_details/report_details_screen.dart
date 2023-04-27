@@ -4,8 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../common/widgets/app_bar_title_widget.dart';
 import '../../model/report.dart';
 import 'widgets/capabilities_and_details_widget.dart';
-import 'widgets/test_case_result_widget.dart';
 import 'widgets/test_case_table_widget.dart';
+import 'widgets/test_result_widget.dart';
 
 class ReportDetailsScreen extends StatelessWidget {
   final Report report;
@@ -34,7 +34,9 @@ class ReportDetailsScreen extends StatelessWidget {
               CapabilitiesAndDetailsWidget(
                 report: report,
               ),
-              const TestResultWidget(),
+              TestResultWidget(
+                report: report,
+              ),
               const TestCaseTableWidget(),
             ],
           ),

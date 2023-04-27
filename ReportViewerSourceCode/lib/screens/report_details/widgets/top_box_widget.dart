@@ -1,19 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class TopBoxWidgetData {
-  String heading;
-  String value;
-
-  TopBoxWidgetData({
-    required this.heading,
-    required this.value,
-  });
-}
+import '../model/top_box_widget_data.dart';
 
 class TopBoxWidget extends StatefulWidget {
   final bool forSmallDevice;
-  final List<TopBoxWidgetData> topBoxDataList;
+  final List<TopBoxData> topBoxDataList;
   final String heading;
 
   const TopBoxWidget({
@@ -53,10 +45,11 @@ class _TopBoxWidgetState extends State<TopBoxWidget> {
                   isExpanded = !isExpanded;
                 });
               },
-              child: HeadingWidget(
+              child: TopBoxHeadingWidget(
                 heading: widget.heading,
                 isExpanded: isExpanded,
                 isSmallScreen: widget.forSmallDevice,
+                extraWidget: null,
               ),
             ),
             if (isExpanded || !widget.forSmallDevice)
@@ -74,10 +67,9 @@ class _TopBoxWidgetState extends State<TopBoxWidget> {
                 ),
                 child: Column(
                   children: [
-                    for (TopBoxWidgetData value in widget.topBoxDataList)
-                      SingleDetailItem(
-                        heading: value.heading,
-                        value: value.value,
+                    for (TopBoxData value in widget.topBoxDataList)
+                      SingleTopBoxItem(
+                        data: value,
                       ),
                   ],
                 ),
@@ -89,13 +81,11 @@ class _TopBoxWidgetState extends State<TopBoxWidget> {
   }
 }
 
-class SingleDetailItem extends StatelessWidget {
-  final String heading;
-  final String value;
+class SingleTopBoxItem extends StatelessWidget {
+  final TopBoxData data;
 
-  const SingleDetailItem({
-    required this.heading,
-    required this.value,
+  const SingleTopBoxItem({
+    required this.data,
     super.key,
   });
 
@@ -109,12 +99,14 @@ class SingleDetailItem extends StatelessWidget {
         children: [
           Icon(
             Icons.arrow_forward_ios_rounded,
-            color: Theme.of(context).primaryColor,
+            color: data.placeHolder
+                ? Colors.transparent
+                : Theme.of(context).primaryColor,
           ),
           Flexible(
             flex: 2,
             child: Text(
-              "$heading ",
+              "${data.heading} ",
               style: const TextStyle(
                 fontWeight: FontWeight.w500,
               ),
@@ -122,7 +114,7 @@ class SingleDetailItem extends StatelessWidget {
           ),
           Flexible(
             child: Text(
-              value,
+              data.value,
               style: const TextStyle(
                 fontWeight: FontWeight.w600,
               ),
@@ -134,15 +126,17 @@ class SingleDetailItem extends StatelessWidget {
   }
 }
 
-class HeadingWidget extends StatelessWidget {
+class TopBoxHeadingWidget extends StatelessWidget {
   final String heading;
   final bool isExpanded;
   final bool isSmallScreen;
+  final Widget? extraWidget;
 
-  const HeadingWidget({
+  const TopBoxHeadingWidget({
     required this.heading,
     required this.isExpanded,
     required this.isSmallScreen,
+    required this.extraWidget,
     super.key,
   });
 
@@ -167,6 +161,12 @@ class HeadingWidget extends StatelessWidget {
           SizedBox(
             width: 5.w,
           ),
+          if (extraWidget != null) ...[
+            extraWidget ?? const SizedBox(),
+            SizedBox(
+              width: 5.w,
+            ),
+          ],
           Text(
             heading,
             style: const TextStyle(
