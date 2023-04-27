@@ -1,12 +1,16 @@
 import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../common/widgets/app_bar_title_widget.dart';
+
 class HomeScreen extends StatefulWidget {
   static const String route = "/";
+
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
@@ -18,33 +22,54 @@ class _HomeScreenState extends State<HomeScreen> {
   DropzoneViewController? drapDropController;
 
   void _oldFileOpen() {}
+
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Import Test Report"),
         actions: [
-          Builder(builder: (context) {
-            String hint = "Report History";
-            if (MediaQuery.of(context).size.shortestSide < 600) {
-              return Tooltip(
-                message: hint,
-                child: IconButton(
-                    onPressed: _oldFileOpen, icon: const Icon(Icons.history)),
-              );
-            } else {
-              return TextButton(
-                onPressed: _oldFileOpen,
-                child: Text(
-                  hint,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
+          SizedBox(
+            width: size.width,
+            child: Stack(
+              children: [
+                const Positioned.fill(
+                  child: AppBarTitleWidget(
+                    title: "Test Report",
                   ),
                 ),
-              );
-            }
-          })
+                Positioned(
+                  top: 0,
+                  bottom: 0,
+                  right: 0,
+                  child: Row(
+                    children: [
+                      Tooltip(
+                        message: "Mini History",
+                        child: IconButton(
+                          onPressed: _oldFileOpen,
+                          icon: const Icon(Icons.history),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 5.w,
+                      ),
+                      Tooltip(
+                        message: "Locally Saved",
+                        child: IconButton(
+                          onPressed: _oldFileOpen,
+                          icon: const Icon(Icons.folder_copy_rounded),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 10.w,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
       body: Center(
@@ -53,24 +78,25 @@ class _HomeScreenState extends State<HomeScreen> {
           width: 300.w,
           child: Stack(
             children: [
-              Positioned.fill(
-                child: DropzoneView(
-                  operation: DragOperation.copy,
-                  cursor: CursorType.grab,
-                  onCreated: (DropzoneViewController ctrl) =>
-                      drapDropController = ctrl,
-                  onHover: () {
-                    _updateHovering(true);
-                  },
-                  onDrop: (dynamic ev) {
-                    _updateHovering(false);
-                    getDataFromDrag(ev);
-                  },
-                  onLeave: () {
-                    _updateHovering(false);
-                  },
+              if (kIsWeb)
+                Positioned.fill(
+                  child: DropzoneView(
+                    operation: DragOperation.copy,
+                    cursor: CursorType.grab,
+                    onCreated: (DropzoneViewController ctrl) =>
+                        drapDropController = ctrl,
+                    onHover: () {
+                      _updateHovering(true);
+                    },
+                    onDrop: (dynamic ev) {
+                      _updateHovering(false);
+                      getDataFromDrag(ev);
+                    },
+                    onLeave: () {
+                      _updateHovering(false);
+                    },
+                  ),
                 ),
-              ),
               Container(
                 decoration: BoxDecoration(
                   color: _isHovering
@@ -100,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             vertical: 5.h,
                           ),
                           child: Icon(
-                            Icons.file_copy_outlined,
+                            Icons.file_present_outlined,
                             color: Theme.of(context).primaryColor,
                           ),
                         ),
@@ -150,45 +176,47 @@ class _HomeScreenState extends State<HomeScreen> {
                     SizedBox(
                       height: 10.h,
                     ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Divider(
-                            color: Theme.of(context).primaryColor,
+                    if (kIsWeb) ...[
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Divider(
+                              color: Theme.of(context).primaryColor,
+                            ),
                           ),
-                        ),
-                        SizedBox(
-                          width: 2.5.w,
-                        ),
-                        Text(
-                          "Or",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Theme.of(context).primaryColor,
-                            fontWeight: FontWeight.w500,
+                          SizedBox(
+                            width: 2.5.w,
                           ),
-                        ),
-                        SizedBox(
-                          width: 2.5.w,
-                        ),
-                        Expanded(
-                          child: Divider(
-                            color: Theme.of(context).primaryColor,
+                          Text(
+                            "Or",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Theme.of(context).primaryColor,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10.h,
-                    ),
-                    Text(
-                      "Drag And Drop",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.w500,
+                          SizedBox(
+                            width: 2.5.w,
+                          ),
+                          Expanded(
+                            child: Divider(
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
+                      SizedBox(
+                        height: 10.h,
+                      ),
+                      Text(
+                        "Drag And Drop",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ]
                   ],
                 ),
               ),

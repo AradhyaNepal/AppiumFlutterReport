@@ -1,4 +1,4 @@
-import 'package:appium_report/screens/homescreen/homescreen.dart';
+import 'package:appium_report/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
