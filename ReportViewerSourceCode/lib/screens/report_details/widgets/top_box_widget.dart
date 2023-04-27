@@ -31,6 +31,7 @@ class _TopBoxWidgetState extends State<TopBoxWidget> {
   @override
   Widget build(BuildContext context) {
     return AnimatedSize(
+      curve: Curves.easeInOut,
       alignment: Alignment.topCenter,
       duration: const Duration(milliseconds: 500),
       child: Container(

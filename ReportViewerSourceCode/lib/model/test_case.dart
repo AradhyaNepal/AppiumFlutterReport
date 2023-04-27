@@ -65,6 +65,7 @@ class TestCase {
       case Status.failed:
         return TestCase.failed;
       case Status.error:
+        return TestCase.error;
       case Status.skipped:
         return TestCase.skipped;
       case Status.none:

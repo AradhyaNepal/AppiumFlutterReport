@@ -26,7 +26,7 @@ class CapabilitiesAndDetailsWidget extends StatelessWidget {
             forSmallDevice: screenIsSmall,
           ),
           SizedBox(
-            height: 10.h,
+            height: 20.h,
           ),
           CapabilitiesWidget(
             capabilities: report.capabilities,
