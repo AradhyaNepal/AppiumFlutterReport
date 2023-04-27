@@ -1,3 +1,4 @@
+import 'package:appium_report/model/test_case.dart';
 import 'package:appium_report/model/test_result_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -132,6 +133,54 @@ class TestResultItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: 7.5.h,
+      ),
+      child: Row(
+        children: [
+          getIcon(),
+          SizedBox(
+            width: 5.w,
+          ),
+          Text(
+            "${isGroup ? testResultData.forGroup : testResultData.forTestCase} ",
+          ),
+          Text(
+            TestCase.getStringStatus(testResultData.status),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget getIcon() {
+    switch (testResultData.status) {
+      case Status.success:
+        return const Icon(
+          Icons.done,
+          color: Colors.green,
+        );
+      case Status.failed:
+        return const Icon(
+          Icons.close,
+          color: Colors.red,
+        );
+      case Status.error:
+        return const Icon(
+          Icons.warning_amber,
+          color: Colors.red,
+        );
+      case Status.skipped:
+        return const Icon(
+          Icons.arrow_right_alt_sharp,
+          color: Colors.green,
+        );
+      case Status.none:
+        return const Icon(
+          Icons.question_mark,
+          color: Colors.green,
+        );
+    }
   }
 }

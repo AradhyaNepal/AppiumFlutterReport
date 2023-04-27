@@ -39,16 +39,36 @@ class TestCase {
 
   static Status _getStatus(String serverValue) {
     switch (serverValue) {
-      case "Success":
+      case TestCase.success:
         return Status.success;
-      case "Failed":
+      case TestCase.failed:
         return Status.failed;
-      case "Error":
+      case TestCase.error:
         return Status.error;
-      case "Skipped":
+      case TestCase.skipped:
         return Status.skipped;
       default:
         return Status.none;
+    }
+  }
+
+  static const String success = "Success";
+  static const String failed = "Failed";
+  static const String error = "Error";
+  static const String skipped = "Skipped";
+  static const String none = "None";
+
+  static String getStringStatus(Status status) {
+    switch (status) {
+      case Status.success:
+        return TestCase.success;
+      case Status.failed:
+        return TestCase.failed;
+      case Status.error:
+      case Status.skipped:
+        return TestCase.skipped;
+      case Status.none:
+        return TestCase.none;
     }
   }
 }
