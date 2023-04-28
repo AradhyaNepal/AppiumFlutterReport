@@ -148,4 +148,6 @@ class TestCaseDataController {
                   e.currentIndex + expandedData.length - removedSiblings),
     ];
   }
+
+  void goBack(ParentData parentData) {}
 }
