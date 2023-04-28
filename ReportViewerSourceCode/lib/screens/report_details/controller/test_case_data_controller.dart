@@ -14,7 +14,6 @@ class TestCaseDataController {
       testCaseWidgetList.add(
         TestCaseRowData(
           actualPosition: [i],
-          testCase: report.result[i],
           parentData: null,
           isGroup: report.result[i].children != null,
         ),
@@ -23,24 +22,23 @@ class TestCaseDataController {
   }
 
   void expandChildren({
-    required int parentIndexOnUI,
+    required TestCaseRowData parentTestCase,
   }) {
-    if (testCaseWidgetList[parentIndexOnUI].testCase.children == null) return;
-    List<TestCaseRowData> expandedData = _getExpandedChildList(
-        parentIndexOnUI: parentIndexOnUI,
-        actualParentIndex: testCaseWidgetList[parentIndexOnUI].actualPosition);
+    final actualParent =
+        _getTestCaseFromActualPosition(parentTestCase.actualPosition);
+    if (actualParent.children == null) return;
+    if ((actualParent.children ?? []).isEmpty) return;
 
-    int removedSiblings = _removeSiblingsOfExpandedParentExceptRoot(
-      actualParentLocation: expandedData.first.parentData!.actualParentLocation,
-      parentIndex: parentIndexOnUI,
+    List<TestCaseRowData> expandedData = _getExpandedChildList(
+        parentRowData: parentTestCase, parentActualData: actualParent);
+
+    _removeSiblingsOfExpandedParentExceptRoot(
+      actualParentLocation: parentTestCase.actualPosition,
     );
 
-    parentIndexOnUI = parentIndexOnUI - removedSiblings;
     _updateUIListWithNewExpandedChildList(
-      parentTestCase: testCaseWidgetList[parentIndexOnUI],
+      parentTestCase: parentTestCase,
       expandedData: expandedData,
-      removedSiblings: removedSiblings,
-      parentIndex: parentIndexOnUI,
     );
   }
 
@@ -58,12 +56,10 @@ class TestCaseDataController {
   /// For root element, allow all the possible root element to be opened.
   ///
   /// After removing return how many items the code had removed
-  int _removeSiblingsOfExpandedParentExceptRoot({
+  void _removeSiblingsOfExpandedParentExceptRoot({
     required List<int> actualParentLocation,
-    required int parentIndex,
   }) {
-    int itemsRemoved = 0;
-    if (actualParentLocation.length < 2) return itemsRemoved;
+    if (actualParentLocation.length < 2) return;
     final grandParentIndex = [...actualParentLocation];
     grandParentIndex.removeLast();
     bool reachedTillParent = false;
@@ -88,40 +84,40 @@ class TestCaseDataController {
         break;
       }
     }
-    for (int i = parentIndex - itemsRemoved + 1;
-        i < testCaseWidgetList.length;
-        i++) {
-      if ((parentIndex - itemsRemoved) < 0) continue;
-    }
-    return itemsRemoved;
   }
 
   List<TestCaseRowData> _getExpandedChildList({
-    required int parentIndexOnUI,
-    required List<int> actualParentIndex,
+    required TestCaseRowData parentRowData,
+    required TestCase parentActualData,
   }) {
     List<TestCaseRowData> expandedData = [];
-    final children =
-        testCaseWidgetList[parentIndexOnUI].testCase.children ?? [];
+    final children = parentActualData.children ?? [];
     for (int i = 0; i < children.length; i++) {
       ChildType childType = _getChildType(i: i, children: children);
       expandedData.add(
         TestCaseRowData(
-          testCase: children[i],
           parentData: ParentData(
             childType: childType,
             parents: [
-              ...testCaseWidgetList[parentIndexOnUI].parentData?.parents ?? [],
-              testCaseWidgetList[parentIndexOnUI].testCase.testName,
+              ...parentRowData.parentData?.parents ?? [],
+              parentActualData.testName,
             ],
-            actualParentLocation: actualParentIndex,
+            actualParentLocation: parentRowData.actualPosition,
           ),
           isGroup: children[i].children != null,
-          actualPosition: [...actualParentIndex, i],
+          actualPosition: [...parentRowData.actualPosition, i],
         ),
       );
     }
     return expandedData;
+  }
+
+  TestCase _getTestCaseFromActualPosition(List<int> actualPosition) {
+    dynamic value;
+    for (var i in actualPosition) {
+      value = report.result[i];
+    }
+    return value;
   }
 
   ChildType _getChildType({
@@ -140,8 +136,6 @@ class TestCaseDataController {
   void _updateUIListWithNewExpandedChildList({
     required TestCaseRowData parentTestCase,
     required List<TestCaseRowData> expandedData,
-    required int removedSiblings,
-    required int parentIndex,
   }) {
     bool isNotFirst = parentIndex != 0;
     bool isNotLast = parentIndex != testCaseWidgetList.length - 1;

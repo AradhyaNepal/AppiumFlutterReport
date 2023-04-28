@@ -1,5 +1,3 @@
-import 'package:appium_report/model/test_case.dart';
-
 enum ChildType {
   first,
   mid,
@@ -7,13 +5,11 @@ enum ChildType {
 }
 
 class TestCaseRowData {
-  final TestCase testCase;
   final ParentData? parentData;
   final bool isGroup;
   final List<int> actualPosition;
 
   TestCaseRowData({
-    required this.testCase,
     required this.parentData,
     required this.isGroup,
     required this.actualPosition,
