@@ -10,6 +10,7 @@ class TestCaseRowData {
   final TestCase testCase;
   final ParentData? parentData;
   final bool isGroup;
+  final bool isGroup;
 
   TestCaseRowData({
     required this.testCase,
