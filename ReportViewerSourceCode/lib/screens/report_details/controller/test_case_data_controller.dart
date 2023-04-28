@@ -13,6 +13,7 @@ class TestCaseDataController {
     for (int i = 0; i < report.result.length; i++) {
       testCaseWidgetList.add(
         TestCaseRowData(
+          actualPosition: [i],
           testCase: report.result[i],
           parentData: null,
           isGroup: report.result[i].children != null,
@@ -22,19 +23,21 @@ class TestCaseDataController {
   }
 
   void expandChildren({
-    required TestCaseRowData parentToBeExpanded,
     required int parentIndexOnUI,
   }) {
-    if (parentToBeExpanded.testCase.children == null) return;
+    if (testCaseWidgetList[parentIndexOnUI].testCase.children == null) return;
     List<TestCaseRowData> expandedData = _getExpandedChildList(
-        parentRowData: parentToBeExpanded, parentIndex: parentIndexOnUI);
+        parentIndexOnUI: parentIndexOnUI,
+        actualParentIndex: testCaseWidgetList[parentIndexOnUI].actualPosition);
+
     int removedSiblings = _removeSiblingsOfExpandedParentExceptRoot(
-      parentLocation: expandedData.first.parentData!.parentIndexLocation,
+      actualParentLocation: expandedData.first.parentData!.actualParentLocation,
       parentIndex: parentIndexOnUI,
     );
+
     parentIndexOnUI = parentIndexOnUI - removedSiblings;
     _updateUIListWithNewExpandedChildList(
-      parentTestCase: parentToBeExpanded,
+      parentTestCase: testCaseWidgetList[parentIndexOnUI],
       expandedData: expandedData,
       removedSiblings: removedSiblings,
       parentIndex: parentIndexOnUI,
@@ -56,12 +59,12 @@ class TestCaseDataController {
   ///
   /// After removing return how many items the code had removed
   int _removeSiblingsOfExpandedParentExceptRoot({
-    required List<int> parentLocation,
+    required List<int> actualParentLocation,
     required int parentIndex,
   }) {
     int itemsRemoved = 0;
-    if (parentLocation.length <= 2) return itemsRemoved;
-    final grandParentIndex = [...parentLocation];
+    if (actualParentLocation.length < 2) return itemsRemoved;
+    final grandParentIndex = [...actualParentLocation];
     grandParentIndex.removeLast();
     bool reachedTillParent = false;
     for (int i = 0; i < testCaseWidgetList.length; i++) {
@@ -77,7 +80,7 @@ class TestCaseDataController {
         reachedTillParent = true;
         continue;
       }
-      if (testCaseWidgetList[i].parentData?.parentIndexLocation.toString() ==
+      if (testCaseWidgetList[i].parentData?.actualParentLocation.toString() ==
           grandParentIndex.toString()) {
         itemsRemoved++;
         testCaseWidgetList.removeAt(i);
@@ -94,42 +97,31 @@ class TestCaseDataController {
   }
 
   List<TestCaseRowData> _getExpandedChildList({
-    required TestCaseRowData parentRowData,
-    required int parentIndex,
+    required int parentIndexOnUI,
+    required List<int> actualParentIndex,
   }) {
     List<TestCaseRowData> expandedData = [];
-    final children = parentRowData.testCase.children ?? [];
+    final children =
+        testCaseWidgetList[parentIndexOnUI].testCase.children ?? [];
     for (int i = 0; i < children.length; i++) {
       ChildType childType = _getChildType(i: i, children: children);
       expandedData.add(
         TestCaseRowData(
           testCase: children[i],
-          parentData: _getChildOpenedData(
-              childType: childType,
-              parentTestCase: parentRowData,
-              parentIndex: parentIndex),
+          parentData: ParentData(
+            childType: childType,
+            parents: [
+              ...testCaseWidgetList[parentIndexOnUI].parentData?.parents ?? [],
+              testCaseWidgetList[parentIndexOnUI].testCase.testName,
+            ],
+            actualParentLocation: actualParentIndex,
+          ),
           isGroup: children[i].children != null,
+          actualPosition: [...actualParentIndex, i],
         ),
       );
     }
     return expandedData;
-  }
-
-  ParentData _getChildOpenedData(
-      {required ChildType childType,
-      required TestCaseRowData parentTestCase,
-      required int parentIndex}) {
-    return ParentData(
-      childType: childType,
-      parents: [
-        ...parentTestCase.parentData?.parents ?? [],
-        parentTestCase.testCase.testName,
-      ],
-      parentIndexLocation: [
-        ...parentTestCase.parentData?.parentIndexLocation ?? [],
-        parentIndex
-      ],
-    );
   }
 
   ChildType _getChildType({
@@ -166,13 +158,5 @@ class TestCaseDataController {
     renderTableData();
     final grandParentIndex = [...parentsIndex];
     grandParentIndex.removeLast();
-
-    //TOdo: This below code is risky
-    for (var index in grandParentIndex) {
-      expandChildren(
-        parentToBeExpanded: testCaseWidgetList[index],
-        parentIndexOnUI: index,
-      );
-    }
   }
 }
