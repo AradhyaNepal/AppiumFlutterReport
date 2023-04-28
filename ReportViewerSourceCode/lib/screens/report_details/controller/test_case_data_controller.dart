@@ -22,13 +22,11 @@ class TestCaseDataController {
     if (parentToBeExpanded.testCase.children == null) return;
     List<TestCaseRowData> expandedData =
         _getExpandedChildList(parentToBeExpanded);
-    _updateUIListWithNewExpandedChildList(parentToBeExpanded, expandedData);
-    if (expandedData.first.parentData == null) return;
-    _removeSiblingsOfExpandedParentExceptRoot(
+    int removedValue=_removeSiblingsOfExpandedParentExceptRoot(
       parentLocation: expandedData.first.parentData!.parentIndexLocation,
-      childStartIndex: parentToBeExpanded.currentIndex,
-      childEndIndex: parentToBeExpanded.currentIndex + expandedData.length,
+      parentIndex: parentToBeExpanded.currentIndex,
     );
+    _updateUIListWithNewExpandedChildList(parentToBeExpanded, expandedData,);
   }
 
   /// Lets say Group1 have Group2 , Group 3 and Test 1 children.
@@ -43,29 +41,40 @@ class TestCaseDataController {
   /// element of the family free which came from report.testCase.
   ///
   /// For root element, allow all the possible root element to be opened.
-  void _removeSiblingsOfExpandedParentExceptRoot({
-    required int childStartIndex,
-    required int childEndIndex,
+  ///
+  /// After removing return how many items the code had removed
+  int _removeSiblingsOfExpandedParentExceptRoot({
     required List<int> parentLocation,
+    required int parentIndex,
   }) {
-    if (parentLocation.length < 2) return;
-    final grandParentLocation = [...parentLocation].removeLast();
-    int timesRemoved=0;
-    for (var i = childStartIndex - 1; i >= 0; i--) {
-      if(testCaseWidgetList[i].parentData==null)break;
-      
-      if(grandParentLocation.toString()==testCaseWidgetList[i].parentData?.parentIndexLocation.toString()){
-        testCaseWidgetList.remove(value)
+    int itemsRemoved = 0;
+    if (parentLocation.length <= 2) return itemsRemoved;
+    final grandParentIndex = [...parentLocation].removeLast();
+    bool reachedTillParent = false;
+    for (int i = 0; i < testCaseWidgetList.length; i++) {
+      if (testCaseWidgetList[i].parentData == null) {
+        if (reachedTillParent) {
+          break;
+        } else {
+          continue;
+        }
+      }
+
+      if (!reachedTillParent &&
+          testCaseWidgetList[i].currentIndex == parentIndex - itemsRemoved) {
+        reachedTillParent = true;
+        testCaseWidgetList[parentIndex-itemsRemoved].currentIndex=pare
         continue;
-      }else{
+      }
+      if (testCaseWidgetList[i].parentData?.parentIndexLocation.toString() ==
+          grandParentIndex.toString()) {
+        itemsRemoved++;
+        testCaseWidgetList.removeAt(i);
+      }else if(reachedTillParent){
         break;
       }
     }
-    if (childEndIndex + 1 >= testCaseWidgetList.length - 1) return;
-    for (var i = childEndIndex + 1; i < testCaseWidgetList.length; i++) {
-      //Remove
-      break;
-    }
+    return itemsRemoved;
   }
 
   List<TestCaseRowData> _getExpandedChildList(TestCaseRowData parentRowData) {
@@ -121,14 +130,11 @@ class TestCaseDataController {
       if (isNotFirst)
         ...testCaseWidgetList.sublist(0, testCaseRowData.currentIndex),
       ...expandedData,
-      if (isNotLast) ..._lastElement(testCaseRowData, expandedData.length),
+      if (isNotLast) ...testCaseWidgetList
+        .sublist(testCaseRowData.currentIndex + 1, testCaseWidgetList.length)
+        .map((e) => e..currentIndex = e.currentIndex + expandedData.length,
     ];
   }
 
-  Iterable<TestCaseRowData> _lastElement(
-      TestCaseRowData testCaseRowData, int extraItemsAdded) {
-    return testCaseWidgetList
-        .sublist(testCaseRowData.currentIndex + 1, testCaseWidgetList.length)
-        .map((e) => e..currentIndex = e.currentIndex + extraItemsAdded);
-  }
+
 }
