@@ -22,11 +22,12 @@ class TestCaseDataController {
     if (parentToBeExpanded.testCase.children == null) return;
     List<TestCaseRowData> expandedData =
         _getExpandedChildList(parentToBeExpanded);
-    int removedValue=_removeSiblingsOfExpandedParentExceptRoot(
+    int removedValue = _removeSiblingsOfExpandedParentExceptRoot(
       parentLocation: expandedData.first.parentData!.parentIndexLocation,
       parentIndex: parentToBeExpanded.currentIndex,
     );
-    _updateUIListWithNewExpandedChildList(parentToBeExpanded, expandedData,);
+    _updateUIListWithNewExpandedChildList(
+        parentToBeExpanded, expandedData, removedValue);
   }
 
   /// Lets say Group1 have Group2 , Group 3 and Test 1 children.
@@ -63,16 +64,24 @@ class TestCaseDataController {
       if (!reachedTillParent &&
           testCaseWidgetList[i].currentIndex == parentIndex - itemsRemoved) {
         reachedTillParent = true;
-        testCaseWidgetList[parentIndex-itemsRemoved].currentIndex=pare
+        testCaseWidgetList[parentIndex - itemsRemoved].currentIndex =
+            parentIndex - itemsRemoved;
         continue;
       }
       if (testCaseWidgetList[i].parentData?.parentIndexLocation.toString() ==
           grandParentIndex.toString()) {
         itemsRemoved++;
         testCaseWidgetList.removeAt(i);
-      }else if(reachedTillParent){
+      } else if (reachedTillParent) {
         break;
       }
+    }
+    for (int i = parentIndex - itemsRemoved + 1;
+        i < testCaseWidgetList.length;
+        i++) {
+      if ((parentIndex - itemsRemoved) < 0) continue;
+      testCaseWidgetList[i].currentIndex =
+          testCaseWidgetList[i].currentIndex - itemsRemoved;
     }
     return itemsRemoved;
   }
@@ -121,8 +130,8 @@ class TestCaseDataController {
     return childType;
   }
 
-  void _updateUIListWithNewExpandedChildList(
-      TestCaseRowData testCaseRowData, List<TestCaseRowData> expandedData) {
+  void _updateUIListWithNewExpandedChildList(TestCaseRowData testCaseRowData,
+      List<TestCaseRowData> expandedData, int removedSiblings) {
     bool isNotFirst = testCaseRowData.currentIndex != 0;
     bool isNotLast =
         testCaseRowData.currentIndex != testCaseWidgetList.length - 1;
@@ -130,11 +139,13 @@ class TestCaseDataController {
       if (isNotFirst)
         ...testCaseWidgetList.sublist(0, testCaseRowData.currentIndex),
       ...expandedData,
-      if (isNotLast) ...testCaseWidgetList
-        .sublist(testCaseRowData.currentIndex + 1, testCaseWidgetList.length)
-        .map((e) => e..currentIndex = e.currentIndex + expandedData.length,
+      if (isNotLast)
+        ...testCaseWidgetList
+            .sublist(
+                testCaseRowData.currentIndex + 1, testCaseWidgetList.length)
+            .map((e) => e
+              ..currentIndex =
+                  e.currentIndex + expandedData.length - removedSiblings),
     ];
   }
-
-
 }
