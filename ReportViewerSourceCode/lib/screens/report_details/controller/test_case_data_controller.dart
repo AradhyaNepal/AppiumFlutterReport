@@ -49,7 +49,23 @@ class TestCaseDataController {
     required List<int> parentLocation,
   }) {
     if (parentLocation.length < 2) return;
-    final grandParentLocation = parentLocation.removeLast();
+    final grandParentLocation = [...parentLocation].removeLast();
+    int timesRemoved=0;
+    for (var i = childStartIndex - 1; i >= 0; i--) {
+      if(testCaseWidgetList[i].parentData==null)break;
+      
+      if(grandParentLocation.toString()==testCaseWidgetList[i].parentData?.parentIndexLocation.toString()){
+        testCaseWidgetList.remove(value)
+        continue;
+      }else{
+        break;
+      }
+    }
+    if (childEndIndex + 1 >= testCaseWidgetList.length - 1) return;
+    for (var i = childEndIndex + 1; i < testCaseWidgetList.length; i++) {
+      //Remove
+      break;
+    }
   }
 
   List<TestCaseRowData> _getExpandedChildList(TestCaseRowData parentRowData) {
