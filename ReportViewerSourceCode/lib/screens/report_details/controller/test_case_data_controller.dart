@@ -21,8 +21,23 @@ class TestCaseDataController {
   void expandChildren(TestCaseRowData testCaseRowData) {
     if (testCaseRowData.testCase.children == null) return;
     List<TestCaseRowData> expandedData = _getExpandedChildList(testCaseRowData);
-    _updateUIListWithNewExpandedData(testCaseRowData, expandedData);
+    _updateUIListWithNewExpandedChildList(testCaseRowData, expandedData);
+    _removeSiblingsOfExpandedParentExceptRoot();
   }
+
+  /// Lets say Group1 have Group2 , Group 3 and Test 1 children.
+  ///
+  /// Group 2 is Expanded, now we need to show Group 2 Children.
+  /// Here Group 2 is Parent of those new Children.
+  ///
+  /// This method removes Group 3 and Test 1, when Group 2 is expanded,
+  /// aka removes Siblings of Group 2 when its expanded.
+  ///
+  /// But lets say Group 1 have also Sibling Group 0, but Group 1 and Group 0 are root (first depth)
+  /// element of the family free which came from report.testCase.
+  ///
+  /// For root element, allow all the possible root element to be opened.
+  void _removeSiblingsOfExpandedParentExceptRoot() {}
 
   List<TestCaseRowData> _getExpandedChildList(TestCaseRowData testCaseRowData) {
     List<TestCaseRowData> expandedData = [];
@@ -68,7 +83,7 @@ class TestCaseDataController {
     return childType;
   }
 
-  void _updateUIListWithNewExpandedData(
+  void _updateUIListWithNewExpandedChildList(
       TestCaseRowData testCaseRowData, List<TestCaseRowData> expandedData) {
     bool isNotFirst = testCaseRowData.currentIndex != 0;
     bool isNotLast =
