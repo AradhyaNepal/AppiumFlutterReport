@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../common/utils/is_big.dart';
 import '../../../model/capabilities.dart';
 import '../model/top_box_widget_data.dart';
-import 'top_box_widget.dart';
+import 'box_widget.dart';
 
 class CapabilitiesAndDetailsWidget extends StatelessWidget {
   final Report report;
@@ -70,7 +70,7 @@ class CapabilitiesWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TopBoxWidget(
+    return BoxWidget(
       topBoxDataList: [
         TopBoxData(heading: "Automation", value: capabilities.automationName),
         TopBoxData(heading: "Platform", value: capabilities.platformName),
@@ -78,7 +78,7 @@ class CapabilitiesWidget extends StatelessWidget {
         TopBoxData(heading: "Package", value: capabilities.appPackage),
         TopBoxData(heading: "Activity", value: capabilities.appActivity),
       ],
-      forSmallDevice: forSmallDevice,
+      canMinimizeExpand: forSmallDevice,
       heading: 'Capabilities',
     );
   }
@@ -96,7 +96,7 @@ class DetailsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TopBoxWidget(
+    return BoxWidget(
       topBoxDataList: [
         TopBoxData(heading: "Start Time", value: report.time),
         TopBoxData(heading: "Testing Duration", value: report.duration),
@@ -106,7 +106,7 @@ class DetailsWidget extends StatelessWidget {
         TopBoxData(heading: "Language", value: report.capabilities.language),
         TopBoxData(heading: "", value: "", placeHolder: true),
       ],
-      forSmallDevice: forSmallDevice,
+      canMinimizeExpand: forSmallDevice,
       heading: 'Basic Details',
     );
   }

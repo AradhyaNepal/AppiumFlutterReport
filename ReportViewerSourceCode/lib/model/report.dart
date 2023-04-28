@@ -2,6 +2,7 @@ import 'package:appium_report/model/capabilities.dart';
 import 'package:appium_report/model/test_case.dart';
 import 'package:appium_report/model/test_result_data.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Report {
   String time;
@@ -56,50 +57,67 @@ class Report {
     }
   }
 
-  final List<TestResultData> _finalCalculatedData = [
+  final padding = EdgeInsets.only(right: 2.5.w);
+
+  late final List<TestResultData> _finalCalculatedData = [
     TestResultData(
       status: Status.success,
       forGroup: 0,
       forTestCase: 0,
-      icon: const Icon(
-        Icons.done,
-        color: Colors.green,
+      icon: Padding(
+        padding: padding,
+        child: const Icon(
+          Icons.done,
+          color: Colors.green,
+        ),
       ),
     ),
     TestResultData(
       status: Status.failed,
       forGroup: 0,
       forTestCase: 0,
-      icon: const Icon(
-        Icons.close,
-        color: Colors.red,
+      icon: Padding(
+        padding: padding,
+        child: const Icon(
+          Icons.close,
+          color: Colors.red,
+        ),
       ),
     ),
     TestResultData(
       status: Status.error,
       forGroup: 0,
       forTestCase: 0,
-      icon: const Icon(
-        Icons.warning_amber,
-        color: Colors.red,
+      icon: Padding(
+        padding: padding,
+        child: const Icon(
+          Icons.warning_amber,
+          color: Colors.red,
+        ),
       ),
     ),
     TestResultData(
       status: Status.skipped,
       forGroup: 0,
       forTestCase: 0,
-      icon: const Icon(
-        Icons.arrow_right_alt_sharp,
-        color: Colors.green,
+      icon: Padding(
+        padding: padding,
+        child: const Icon(
+          Icons.arrow_right_alt_sharp,
+          color: Colors.green,
+        ),
       ),
     ),
     TestResultData(
       status: Status.none,
       forGroup: 0,
       forTestCase: 0,
-      icon: const Icon(
-        Icons.question_mark,
-        color: Colors.black,
+      icon: Padding(
+        padding: padding,
+        child: const Icon(
+          Icons.question_mark,
+          color: Colors.black,
+        ),
       ),
     ),
   ];

@@ -1,31 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../common/utils/is_big.dart';
 import '../model/top_box_widget_data.dart';
 
-class TopBoxWidget extends StatefulWidget {
-  final bool forSmallDevice;
+class BoxWidget extends StatefulWidget {
+  final bool canMinimizeExpand;
   final List<TopBoxData> topBoxDataList;
   final String heading;
+  final VoidCallback? onChanged;
 
-  const TopBoxWidget({
+  ///Only works if the widget can be minimized
+  final bool defaultMinimized;
+
+  const BoxWidget({
     required this.topBoxDataList,
-    required this.forSmallDevice,
+    required this.canMinimizeExpand,
     required this.heading,
+    this.defaultMinimized = true,
+    this.onChanged,
     Key? key,
   }) : super(key: key);
 
   @override
-  State<TopBoxWidget> createState() => _TopBoxWidgetState();
+  State<BoxWidget> createState() => _BoxWidgetState();
 }
 
-class _TopBoxWidgetState extends State<TopBoxWidget> {
-  bool isExpanded = false;
+class _BoxWidgetState extends State<BoxWidget> {
+  bool isExpanded = true;
 
   @override
   void initState() {
-    isExpanded = !widget.forSmallDevice;
+    if (widget.canMinimizeExpand) {
+      isExpanded = !widget.defaultMinimized;
+    }
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant BoxWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    isExpanded = !widget.defaultMinimized;
   }
 
   @override
@@ -39,9 +54,14 @@ class _TopBoxWidgetState extends State<TopBoxWidget> {
           borderRadius: BorderRadius.circular(10.r),
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             GestureDetector(
               onTap: () {
+                if (!widget.canMinimizeExpand) return;
+                if (widget.onChanged != null) {
+                  widget.onChanged!();
+                }
                 setState(() {
                   isExpanded = !isExpanded;
                 });
@@ -49,11 +69,11 @@ class _TopBoxWidgetState extends State<TopBoxWidget> {
               child: TopBoxHeadingWidget(
                 heading: widget.heading,
                 isExpanded: isExpanded,
-                isSmallScreen: widget.forSmallDevice,
+                isSmallScreen: widget.canMinimizeExpand,
                 extraWidget: null,
               ),
             ),
-            if (isExpanded || !widget.forSmallDevice)
+            if (isExpanded || !widget.canMinimizeExpand)
               Container(
                 decoration: BoxDecoration(
                   color: Theme.of(context).primaryColor.withOpacity(0.2),
@@ -66,7 +86,9 @@ class _TopBoxWidgetState extends State<TopBoxWidget> {
                   vertical: 5.h,
                   horizontal: 5.w,
                 ),
+                alignment: Alignment.center,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     for (TopBoxData value in widget.topBoxDataList)
                       SingleTopBoxItem(
@@ -97,13 +119,20 @@ class SingleTopBoxItem extends StatelessWidget {
         bottom: 7.5.h,
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Icon(
-            Icons.arrow_forward_ios_rounded,
-            color: data.placeHolder
-                ? Colors.transparent
-                : Theme.of(context).primaryColor,
-          ),
+          data.icon != null
+              ? SizedBox(
+                  height: isSmall(context) ? 22.sp : 8.sp,
+                  child: FittedBox(child: data.icon),
+                )
+              : Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: data.placeHolder
+                      ? Colors.transparent
+                      : Theme.of(context).primaryColor,
+                ),
           Flexible(
             flex: 2,
             child: Text(

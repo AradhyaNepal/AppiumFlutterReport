@@ -4,12 +4,13 @@ from appium import webdriver
 
 class DriverSetup:
     report_path = ""
+    app_name = "Hamro Mofin"
     url = 'http://localhost:4723'
     capabilities = dict(
         platformName='Android',
         automationName='flutter',
         deviceName='emulator-5554',
-        appPackage='com.mofin.oxpan_mofin',
+        appPackage='com.example.animation',
         appActivity='.MainActivity',
         language='en',
         locale='US',
