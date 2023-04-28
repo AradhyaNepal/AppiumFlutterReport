@@ -11,23 +11,27 @@ class TestCaseDataController {
         TestCaseRowData(
           testCase: report.result[i],
           parentData: null,
-          currentIndex: i,
           isGroup: report.result[i].children != null,
         ),
       );
     }
   }
 
-  void expandChildren(TestCaseRowData parentToBeExpanded) {
+  void expandChildren(TestCaseRowData parentToBeExpanded, int parentIndex) {
     if (parentToBeExpanded.testCase.children == null) return;
-    List<TestCaseRowData> expandedData =
-        _getExpandedChildList(parentToBeExpanded);
-    int removedValue = _removeSiblingsOfExpandedParentExceptRoot(
+    List<TestCaseRowData> expandedData = _getExpandedChildList(
+        parentRowData: parentToBeExpanded, parentIndex: parentIndex);
+    int removedSiblings = _removeSiblingsOfExpandedParentExceptRoot(
       parentLocation: expandedData.first.parentData!.parentIndexLocation,
-      parentIndex: parentToBeExpanded.currentIndex,
+      parentIndex: parentIndex,
     );
+    parentIndex = parentIndex - removedSiblings;
     _updateUIListWithNewExpandedChildList(
-        parentToBeExpanded, expandedData, removedValue);
+      parentTestCase: parentToBeExpanded,
+      expandedData: expandedData,
+      removedSiblings: removedSiblings,
+      parentIndex: parentIndex,
+    );
   }
 
   /// Lets say Group1 have Group2 , Group 3 and Test 1 children.
@@ -61,11 +65,8 @@ class TestCaseDataController {
         }
       }
 
-      if (!reachedTillParent &&
-          testCaseWidgetList[i].currentIndex == parentIndex - itemsRemoved) {
+      if (!reachedTillParent && i == parentIndex - itemsRemoved) {
         reachedTillParent = true;
-        testCaseWidgetList[parentIndex - itemsRemoved].currentIndex =
-            parentIndex - itemsRemoved;
         continue;
       }
       if (testCaseWidgetList[i].parentData?.parentIndexLocation.toString() ==
@@ -80,16 +81,16 @@ class TestCaseDataController {
         i < testCaseWidgetList.length;
         i++) {
       if ((parentIndex - itemsRemoved) < 0) continue;
-      testCaseWidgetList[i].currentIndex =
-          testCaseWidgetList[i].currentIndex - itemsRemoved;
     }
     return itemsRemoved;
   }
 
-  List<TestCaseRowData> _getExpandedChildList(TestCaseRowData parentRowData) {
+  List<TestCaseRowData> _getExpandedChildList({
+    required TestCaseRowData parentRowData,
+    required int parentIndex,
+  }) {
     List<TestCaseRowData> expandedData = [];
     final children = parentRowData.testCase.children ?? [];
-    int parentIndex = parentRowData.currentIndex;
     for (int i = 0; i < children.length; i++) {
       ChildType childType = _getChildType(i, children);
       expandedData.add(
@@ -97,7 +98,6 @@ class TestCaseDataController {
           testCase: children[i],
           parentData:
               _getChildOpenedData(childType, parentRowData, parentIndex),
-          currentIndex: parentIndex + i,
           isGroup: children[i].children != null,
         ),
       );
@@ -130,22 +130,20 @@ class TestCaseDataController {
     return childType;
   }
 
-  void _updateUIListWithNewExpandedChildList(TestCaseRowData testCaseRowData,
-      List<TestCaseRowData> expandedData, int removedSiblings) {
-    bool isNotFirst = testCaseRowData.currentIndex != 0;
-    bool isNotLast =
-        testCaseRowData.currentIndex != testCaseWidgetList.length - 1;
+  void _updateUIListWithNewExpandedChildList({
+    required TestCaseRowData parentTestCase,
+    required List<TestCaseRowData> expandedData,
+    required int removedSiblings,
+    required int parentIndex,
+  }) {
+    bool isNotFirst = parentIndex != 0;
+    bool isNotLast = parentIndex != testCaseWidgetList.length - 1;
     testCaseWidgetList = [
-      if (isNotFirst)
-        ...testCaseWidgetList.sublist(0, testCaseRowData.currentIndex),
+      if (isNotFirst) ...testCaseWidgetList.sublist(0, parentIndex),
       ...expandedData,
       if (isNotLast)
-        ...testCaseWidgetList
-            .sublist(
-                testCaseRowData.currentIndex + 1, testCaseWidgetList.length)
-            .map((e) => e
-              ..currentIndex =
-                  e.currentIndex + expandedData.length - removedSiblings),
+        ...testCaseWidgetList.sublist(
+            parentIndex + 1, testCaseWidgetList.length),
     ];
   }
 

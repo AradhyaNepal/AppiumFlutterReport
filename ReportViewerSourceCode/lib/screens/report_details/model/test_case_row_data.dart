@@ -7,7 +7,6 @@ enum ChildType {
 }
 
 class TestCaseRowData {
-  int currentIndex;
   final TestCase testCase;
   final ParentData? parentData;
   final bool isGroup;
@@ -15,7 +14,6 @@ class TestCaseRowData {
   TestCaseRowData({
     required this.testCase,
     required this.parentData,
-    required this.currentIndex,
     required this.isGroup,
   }) : assert(!isGroup && parentData != null, "Only Group Can Have Child Data");
 }
