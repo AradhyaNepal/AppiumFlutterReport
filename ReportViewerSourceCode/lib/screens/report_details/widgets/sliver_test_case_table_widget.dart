@@ -14,7 +14,7 @@ class SliverTestCaseTableWidget extends StatelessWidget {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (context, index) {
-          return list[index];
+          return TestCaseRowWidget(data: list[index]);
         },
         childCount: list.length,
       ),

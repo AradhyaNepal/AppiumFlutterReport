@@ -9,7 +9,7 @@ enum ChildType {
 class TestCaseRowData {
   final int currentIndex;
   final TestCase testCase;
-  final IsChildData? childOpenedData;
+  final ChildOpenedData? childOpenedData;
   final bool isGroup;
 
   TestCaseRowData({
@@ -21,13 +21,13 @@ class TestCaseRowData {
             "Only Group Can Have Child Data");
 }
 
-class IsChildData {
+class ChildOpenedData {
   ///Index from first element as first parent to last element as last parent
   List<int> parentIndexLocation;
   List<String> parents;
   ChildType childType;
 
-  IsChildData({
+  ChildOpenedData({
     required this.childType,
     required this.parents,
     required this.parentIndexLocation,
