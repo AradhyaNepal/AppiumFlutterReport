@@ -10,7 +10,7 @@ class TestCaseDataController {
       testCaseWidgetList.add(
         TestCaseRowData(
           testCase: report.result[i],
-          childOpenedData: null,
+          parentData: null,
           currentIndex: i,
           isGroup: report.result[i].children != null,
         ),
@@ -23,9 +23,12 @@ class TestCaseDataController {
     List<TestCaseRowData> expandedData =
         _getExpandedChildList(parentToBeExpanded);
     _updateUIListWithNewExpandedChildList(parentToBeExpanded, expandedData);
-    if (expandedData.first.childOpenedData == null) return;
+    if (expandedData.first.parentData == null) return;
     _removeSiblingsOfExpandedParentExceptRoot(
-        expandedData.first.childOpenedData!.parentIndexLocation);
+      parentLocation: expandedData.first.parentData!.parentIndexLocation,
+      childStartIndex: parentToBeExpanded.currentIndex,
+      childEndIndex: parentToBeExpanded.currentIndex + expandedData.length,
+    );
   }
 
   /// Lets say Group1 have Group2 , Group 3 and Test 1 children.
@@ -40,19 +43,26 @@ class TestCaseDataController {
   /// element of the family free which came from report.testCase.
   ///
   /// For root element, allow all the possible root element to be opened.
-  void _removeSiblingsOfExpandedParentExceptRoot(List<int> parentIndex) {}
+  void _removeSiblingsOfExpandedParentExceptRoot({
+    required int childStartIndex,
+    required int childEndIndex,
+    required List<int> parentLocation,
+  }) {
+    if (parentLocation.length < 2) return;
+    final grandParentLocation = parentLocation.removeLast();
+  }
 
-  List<TestCaseRowData> _getExpandedChildList(TestCaseRowData testCaseRowData) {
+  List<TestCaseRowData> _getExpandedChildList(TestCaseRowData parentRowData) {
     List<TestCaseRowData> expandedData = [];
-    final children = testCaseRowData.testCase.children ?? [];
-    int parentIndex = testCaseRowData.currentIndex;
+    final children = parentRowData.testCase.children ?? [];
+    int parentIndex = parentRowData.currentIndex;
     for (int i = 0; i < children.length; i++) {
       ChildType childType = _getChildType(i, children);
       expandedData.add(
         TestCaseRowData(
           testCase: children[i],
-          childOpenedData:
-              _getChildOpenedData(childType, testCaseRowData, parentIndex),
+          parentData:
+              _getChildOpenedData(childType, parentRowData, parentIndex),
           currentIndex: parentIndex + i,
           isGroup: children[i].children != null,
         ),
@@ -61,16 +71,16 @@ class TestCaseDataController {
     return expandedData;
   }
 
-  ChildOpenedData _getChildOpenedData(
+  ParentData _getChildOpenedData(
       ChildType childType, TestCaseRowData parentTestCase, int parentIndex) {
-    return ChildOpenedData(
+    return ParentData(
       childType: childType,
       parents: [
-        ...parentTestCase.childOpenedData?.parents ?? [],
+        ...parentTestCase.parentData?.parents ?? [],
         parentTestCase.testCase.testName,
       ],
       parentIndexLocation: [
-        ...parentTestCase.childOpenedData?.parentIndexLocation ?? [],
+        ...parentTestCase.parentData?.parentIndexLocation ?? [],
         parentIndex
       ],
     );

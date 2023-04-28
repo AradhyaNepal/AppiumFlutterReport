@@ -9,25 +9,24 @@ enum ChildType {
 class TestCaseRowData {
   int currentIndex;
   final TestCase testCase;
-  final ChildOpenedData? childOpenedData;
+  final ParentData? parentData;
   final bool isGroup;
 
   TestCaseRowData({
     required this.testCase,
-    required this.childOpenedData,
+    required this.parentData,
     required this.currentIndex,
     required this.isGroup,
-  }) : assert(!isGroup && childOpenedData != null,
-            "Only Group Can Have Child Data");
+  }) : assert(!isGroup && parentData != null, "Only Group Can Have Child Data");
 }
 
-class ChildOpenedData {
+class ParentData {
   ///Index from first element as first parent to last element as last parent
   List<int> parentIndexLocation;
   List<String> parents;
   ChildType childType;
 
-  ChildOpenedData({
+  ParentData({
     required this.childType,
     required this.parents,
     required this.parentIndexLocation,
