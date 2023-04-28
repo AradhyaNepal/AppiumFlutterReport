@@ -212,40 +212,4 @@ class TestResultItemWidget extends StatelessWidget {
       ),
     );
   }
-
-  Widget getIcon(BuildContext context) {
-    final size = isSmall(context) ? 20.sp : 8.sp;
-    switch (testResultData.status) {
-      case Status.success:
-        return Icon(
-          Icons.done,
-          color: Colors.green,
-          size: size,
-        );
-      case Status.failed:
-        return Icon(
-          Icons.close,
-          color: Colors.red,
-          size: size,
-        );
-      case Status.error:
-        return Icon(
-          Icons.warning_amber,
-          color: Colors.red,
-          size: size,
-        );
-      case Status.skipped:
-        return Icon(
-          Icons.arrow_right_alt_sharp,
-          color: Colors.green,
-          size: size,
-        );
-      case Status.none:
-        return Icon(
-          Icons.question_mark,
-          color: Colors.black,
-          size: size,
-        );
-    }
-  }
 }

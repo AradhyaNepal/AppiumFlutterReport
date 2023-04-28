@@ -1,6 +1,7 @@
 import 'package:appium_report/model/capabilities.dart';
 import 'package:appium_report/model/test_case.dart';
 import 'package:appium_report/model/test_result_data.dart';
+import 'package:flutter/material.dart';
 
 class Report {
   String time;
@@ -9,38 +10,6 @@ class Report {
   List<TestCase> result;
   String duration;
   String generatingReportTime;
-
-  bool _finalDataCalculated = false;
-
-  List<TestResultData> get finalCalculatedData {
-    if (_finalDataCalculated) return _finalCalculatedData;
-    _fetchFinalCalculatedData(result);
-    return _finalCalculatedData;
-  }
-
-  void _fetchFinalCalculatedData(List<TestCase> parentTestCaseList) {
-    for (final childTestCase in parentTestCaseList) {
-      for (int i = 0; i < _finalCalculatedData.length; i++) {
-        if (childTestCase.status == _finalCalculatedData[i].status) {
-          if (childTestCase.children == null) {
-            _finalCalculatedData[i].forTestCase++;
-          } else {
-            _finalCalculatedData[i].forGroup++;
-            _fetchFinalCalculatedData(childTestCase.children ?? []);
-          }
-          break;
-        }
-      }
-    }
-  }
-
-  final List<TestResultData> _finalCalculatedData = [
-    TestResultData(status: Status.success, forGroup: 0, forTestCase: 0),
-    TestResultData(status: Status.failed, forGroup: 0, forTestCase: 0),
-    TestResultData(status: Status.error, forGroup: 0, forTestCase: 0),
-    TestResultData(status: Status.skipped, forGroup: 0, forTestCase: 0),
-    TestResultData(status: Status.none, forGroup: 0, forTestCase: 0),
-  ];
 
   Report({
     required this.time,
@@ -61,4 +30,77 @@ class Report {
       generatingReportTime: map["generatingReportTime"],
     );
   }
+
+  bool _finalDataCalculated = false;
+
+  List<TestResultData> get finalCalculatedData {
+    if (_finalDataCalculated) return _finalCalculatedData;
+    _fetchFinalCalculatedData(result);
+    _finalDataCalculated = true;
+    return _finalCalculatedData;
+  }
+
+  void _fetchFinalCalculatedData(List<TestCase> parentTestCaseList) {
+    for (final childTestCase in parentTestCaseList) {
+      for (int i = 0; i < _finalCalculatedData.length; i++) {
+        if (childTestCase.status == _finalCalculatedData[i].status) {
+          if (childTestCase.children == null) {
+            _finalCalculatedData[i].forTestCase++;
+          } else {
+            _finalCalculatedData[i].forGroup++;
+            _fetchFinalCalculatedData(childTestCase.children ?? []);
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  final List<TestResultData> _finalCalculatedData = [
+    TestResultData(
+      status: Status.success,
+      forGroup: 0,
+      forTestCase: 0,
+      icon: const Icon(
+        Icons.done,
+        color: Colors.green,
+      ),
+    ),
+    TestResultData(
+      status: Status.failed,
+      forGroup: 0,
+      forTestCase: 0,
+      icon: const Icon(
+        Icons.close,
+        color: Colors.red,
+      ),
+    ),
+    TestResultData(
+      status: Status.error,
+      forGroup: 0,
+      forTestCase: 0,
+      icon: const Icon(
+        Icons.warning_amber,
+        color: Colors.red,
+      ),
+    ),
+    TestResultData(
+      status: Status.skipped,
+      forGroup: 0,
+      forTestCase: 0,
+      icon: const Icon(
+        Icons.arrow_right_alt_sharp,
+        color: Colors.green,
+      ),
+    ),
+    TestResultData(
+      status: Status.none,
+      forGroup: 0,
+      forTestCase: 0,
+      icon: const Icon(
+        Icons.question_mark,
+        color: Colors.black,
+      ),
+    ),
+  ];
 }
