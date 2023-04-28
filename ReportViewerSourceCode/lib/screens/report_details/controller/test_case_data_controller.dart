@@ -18,11 +18,14 @@ class TestCaseDataController {
     }
   }
 
-  void expandChildren(TestCaseRowData testCaseRowData) {
-    if (testCaseRowData.testCase.children == null) return;
-    List<TestCaseRowData> expandedData = _getExpandedChildList(testCaseRowData);
-    _updateUIListWithNewExpandedChildList(testCaseRowData, expandedData);
-    _removeSiblingsOfExpandedParentExceptRoot();
+  void expandChildren(TestCaseRowData parentToBeExpanded) {
+    if (parentToBeExpanded.testCase.children == null) return;
+    List<TestCaseRowData> expandedData =
+        _getExpandedChildList(parentToBeExpanded);
+    _updateUIListWithNewExpandedChildList(parentToBeExpanded, expandedData);
+    if (expandedData.first.childOpenedData == null) return;
+    _removeSiblingsOfExpandedParentExceptRoot(
+        expandedData.first.childOpenedData!.parentIndexLocation);
   }
 
   /// Lets say Group1 have Group2 , Group 3 and Test 1 children.
@@ -37,7 +40,7 @@ class TestCaseDataController {
   /// element of the family free which came from report.testCase.
   ///
   /// For root element, allow all the possible root element to be opened.
-  void _removeSiblingsOfExpandedParentExceptRoot() {}
+  void _removeSiblingsOfExpandedParentExceptRoot(List<int> parentIndex) {}
 
   List<TestCaseRowData> _getExpandedChildList(TestCaseRowData testCaseRowData) {
     List<TestCaseRowData> expandedData = [];
@@ -59,15 +62,15 @@ class TestCaseDataController {
   }
 
   ChildOpenedData _getChildOpenedData(
-      ChildType childType, TestCaseRowData testCaseRowData, int parentIndex) {
+      ChildType childType, TestCaseRowData parentTestCase, int parentIndex) {
     return ChildOpenedData(
       childType: childType,
       parents: [
-        ...testCaseRowData.childOpenedData?.parents ?? [],
-        testCaseRowData.testCase.testName
+        ...parentTestCase.childOpenedData?.parents ?? [],
+        parentTestCase.testCase.testName,
       ],
       parentIndexLocation: [
-        ...testCaseRowData.childOpenedData?.parentIndexLocation ?? [],
+        ...parentTestCase.childOpenedData?.parentIndexLocation ?? [],
         parentIndex
       ],
     );
@@ -92,9 +95,14 @@ class TestCaseDataController {
       if (isNotFirst)
         ...testCaseWidgetList.sublist(0, testCaseRowData.currentIndex),
       ...expandedData,
-      if (isNotLast)
-        ...testCaseWidgetList.sublist(
-            testCaseRowData.currentIndex + 1, testCaseWidgetList.length),
+      if (isNotLast) ..._lastElement(testCaseRowData, expandedData.length),
     ];
+  }
+
+  Iterable<TestCaseRowData> _lastElement(
+      TestCaseRowData testCaseRowData, int extraItemsAdded) {
+    return testCaseWidgetList
+        .sublist(testCaseRowData.currentIndex + 1, testCaseWidgetList.length)
+        .map((e) => e..currentIndex = e.currentIndex + extraItemsAdded);
   }
 }

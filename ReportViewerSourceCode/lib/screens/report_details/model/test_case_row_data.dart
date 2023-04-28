@@ -7,7 +7,7 @@ enum ChildType {
 }
 
 class TestCaseRowData {
-  final int currentIndex;
+  int currentIndex;
   final TestCase testCase;
   final ChildOpenedData? childOpenedData;
   final bool isGroup;
