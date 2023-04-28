@@ -30,7 +30,9 @@ class TestCaseDataController {
     if ((actualParent.children ?? []).isEmpty) return;
 
     List<TestCaseRowData> expandedData = _getExpandedChildList(
-        parentRowData: parentTestCase, parentActualData: actualParent);
+      parentRowData: parentTestCase,
+      parentActualData: actualParent,
+    );
 
     _removeSiblingsOfExpandedParentExceptRoot(
       actualParentLocation: parentTestCase.actualPosition,
@@ -62,28 +64,55 @@ class TestCaseDataController {
     if (actualParentLocation.length < 2) return;
     final grandParentIndex = [...actualParentLocation];
     grandParentIndex.removeLast();
-    bool reachedTillParent = false;
-    for (int i = 0; i < testCaseWidgetList.length; i++) {
-      if (testCaseWidgetList[i].parentData == null) {
-        if (reachedTillParent) {
-          break;
-        } else {
-          continue;
-        }
-      }
+    final String grandParentIndexString = grandParentIndex.toString();
+    int parentUIIndex = _getParentIndex(actualParentLocation);
+    _removeAfterParentData(parentUIIndex, grandParentIndexString);
+    _removeBeforeParentData(parentUIIndex, grandParentIndexString);
+  }
 
-      if (!reachedTillParent && i == parentIndex - itemsRemoved) {
-        reachedTillParent = true;
-        continue;
+  void _removeAfterParentData(int parentUIIndex, String grandParentIndex) {
+    if (parentUIIndex + 1 > testCaseWidgetList.length - 1) return;
+    for (int i = parentUIIndex + 1; i < testCaseWidgetList.length; i++) {
+      if (testCaseWidgetList[i].parentData == null) {
+        break;
       }
       if (testCaseWidgetList[i].parentData?.actualParentLocation.toString() ==
-          grandParentIndex.toString()) {
-        itemsRemoved++;
+          grandParentIndex) {
         testCaseWidgetList.removeAt(i);
-      } else if (reachedTillParent) {
+      } else {
         break;
       }
     }
+  }
+
+  void _removeBeforeParentData(int parentUIIndex, String grandParentIndex) {
+    int tillWhereGrandParentFound = parentUIIndex;
+    for (int i = parentUIIndex - 1; i >= 0; i--) {
+      if (testCaseWidgetList[i].parentData == null) {
+        break;
+      }
+      if (testCaseWidgetList[i].parentData?.actualParentLocation.toString() ==
+          grandParentIndex) {
+        tillWhereGrandParentFound--;
+      } else {
+        break;
+      }
+    }
+
+    if (tillWhereGrandParentFound < parentUIIndex) {
+      testCaseWidgetList = [
+        if (tillWhereGrandParentFound != 0)
+          ...testCaseWidgetList.sublist(0, tillWhereGrandParentFound),
+        if (parentUIIndex != testCaseWidgetList.length - 1)
+          ...testCaseWidgetList.sublist(
+              parentUIIndex, testCaseWidgetList.length),
+      ];
+    }
+  }
+
+  int _getParentIndex(List<int> actualParentLocation) {
+    return testCaseWidgetList.indexWhere((element) =>
+        element.actualPosition.toString() == actualParentLocation.toString());
   }
 
   List<TestCaseRowData> _getExpandedChildList({
