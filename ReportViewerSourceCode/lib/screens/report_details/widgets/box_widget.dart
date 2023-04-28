@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../common/utils/is_big.dart';
-import '../model/top_box_widget_data.dart';
+import '../model/box_widget_data.dart';
 
 class BoxWidget extends StatefulWidget {
   final bool canMinimizeExpand;
@@ -129,7 +129,7 @@ class SingleTopBoxItem extends StatelessWidget {
                 )
               : Icon(
                   Icons.arrow_forward_ios_rounded,
-                  color: data.placeHolder
+                  color: data.isPlaceHolder
                       ? Colors.transparent
                       : Theme.of(context).primaryColor,
                 ),

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../model/report.dart';
-import '../model/top_box_widget_data.dart';
+import '../model/box_widget_data.dart';
 
 class TestResultWidget extends StatefulWidget {
   final Report report;

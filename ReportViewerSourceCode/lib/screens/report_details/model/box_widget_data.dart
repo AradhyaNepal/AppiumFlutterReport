@@ -4,12 +4,12 @@ class TopBoxData {
   String heading;
   String value;
   Widget? icon;
-  bool placeHolder;
+  bool isPlaceHolder;
 
   TopBoxData({
     required this.heading,
     required this.value,
-    this.placeHolder = false,
+    this.isPlaceHolder = false,
     this.icon,
   });
 }

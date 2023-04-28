@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../common/utils/is_big.dart';
 import '../../../model/capabilities.dart';
-import '../model/top_box_widget_data.dart';
+import '../model/box_widget_data.dart';
 import 'box_widget.dart';
 
 class CapabilitiesAndDetailsWidget extends StatelessWidget {
@@ -104,7 +104,7 @@ class DetailsWidget extends StatelessWidget {
             heading: "Report Generating Duration",
             value: report.generatingReportTime),
         TopBoxData(heading: "Language", value: report.capabilities.language),
-        TopBoxData(heading: "", value: "", placeHolder: true),
+        TopBoxData(heading: "", value: "", isPlaceHolder: true),
       ],
       canMinimizeExpand: forSmallDevice,
       heading: 'Basic Details',

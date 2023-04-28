@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class TestCaseTableWidget extends StatelessWidget {
-  const TestCaseTableWidget({
+class SearchWidget extends StatelessWidget {
+  const SearchWidget({
     super.key,
   });
 
