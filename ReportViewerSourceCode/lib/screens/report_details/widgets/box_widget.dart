@@ -68,7 +68,7 @@ class _BoxWidgetState extends State<BoxWidget> {
               },
               child: TopBoxHeadingWidget(
                 heading: widget.heading,
-                isExpanded: isExpanded,
+                sharpButtonBorder: isExpanded || !widget.canMinimizeExpand,
                 isSmallScreen: widget.canMinimizeExpand,
                 extraWidget: null,
               ),
@@ -158,13 +158,13 @@ class SingleTopBoxItem extends StatelessWidget {
 
 class TopBoxHeadingWidget extends StatelessWidget {
   final String heading;
-  final bool isExpanded;
+  final bool sharpButtonBorder;
   final bool isSmallScreen;
   final Widget? extraWidget;
 
   const TopBoxHeadingWidget({
     required this.heading,
-    required this.isExpanded,
+    required this.sharpButtonBorder,
     required this.isSmallScreen,
     required this.extraWidget,
     super.key,
@@ -178,8 +178,8 @@ class TopBoxHeadingWidget extends StatelessWidget {
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(10.r),
           topRight: Radius.circular(10.r),
-          bottomLeft: isExpanded ? Radius.zero : Radius.circular(10.r),
-          bottomRight: isExpanded ? Radius.zero : Radius.circular(10.r),
+          bottomLeft: sharpButtonBorder ? Radius.zero : Radius.circular(10.r),
+          bottomRight: sharpButtonBorder ? Radius.zero : Radius.circular(10.r),
         ),
         color: Theme.of(context).primaryColor.withOpacity(0.8),
       ),
@@ -207,7 +207,7 @@ class TopBoxHeadingWidget extends StatelessWidget {
           if (isSmallScreen) ...[
             const Spacer(),
             Icon(
-              isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+              sharpButtonBorder ? Icons.arrow_drop_up : Icons.arrow_drop_down,
               color: Colors.white,
             ),
             SizedBox(

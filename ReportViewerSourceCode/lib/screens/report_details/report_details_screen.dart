@@ -41,7 +41,7 @@ class ReportDetailsScreen extends StatelessWidget {
                 report: report,
               ),
               SizedBox(
-                height: 10.h,
+                height: 20.h,
               ),
               const TestCaseTableWidget(),
             ],
