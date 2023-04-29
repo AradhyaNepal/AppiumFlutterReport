@@ -7,7 +7,7 @@
     "platformName": "Android",
     "automationName": "AppName",
     "deviceName": "emulator-5554",
-    "appPackage": "com.mofin.oxpan_mofin",
+    "appPackage": "com.example.animation",
     "appActivity": ".MainActivity",
     "language": "en",
     "locale": "US"

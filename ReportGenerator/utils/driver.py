@@ -4,7 +4,7 @@ from appium import webdriver
 
 class DriverSetup:
     report_path = ""
-    app_name = "Hamro Mofin"
+    app_name = "Animation Test"
     url = 'http://localhost:4723'
     capabilities = dict(
         platformName='Android',
