@@ -3,6 +3,7 @@ import 'package:appium_report/screens/report_details/model/test_case_row_data.da
 
 class TestCaseDataController {
   List<TestCaseRowData> _rowList = [];
+
   List<TestCaseRowData> get rowList =>
       List.unmodifiable(_rowList); //Todo: may cause bug. Do Testing
   final List<TestCase> _originalTestCase;
@@ -23,10 +24,15 @@ class TestCaseDataController {
     }
   }
 
-  void forDownloadTableRender() {}
+  void forDownloadTableRender() {
+    _rowList.clear();
+    _insertFirstDepthOfDataToRowList();
+    _renderAllDeepChildrenForDownload();
+  }
 
   void expandChildren({
     required TestCaseRowData parentTestCase,
+    bool removeSiblings = true,
   }) {
     if (parentTestCase.testCase.children == null) return;
     if ((parentTestCase.testCase.children ?? []).isEmpty) return;
@@ -36,10 +42,11 @@ class TestCaseDataController {
       parentActualData: parentTestCase.testCase,
     );
 
-    _removeSiblingsOfExpandedParentExceptRoot(
-      actualParentLocation: parentTestCase.actualPosition,
-    );
-
+    if (removeSiblings) {
+      _removeSiblingsOfExpandedParentExceptRoot(
+        actualParentLocation: parentTestCase.actualPosition,
+      );
+    }
     _updateUIListWithNewExpandedChildList(
       parentTestCase: parentTestCase,
       expandedData: expandedData,
@@ -214,5 +221,51 @@ class TestCaseDataController {
   int _getParentIndex(List<int> actualParentLocation) {
     return _rowList.indexWhere((element) =>
         element.actualPosition.toString() == actualParentLocation.toString());
+  }
+
+  void _insertFirstDepthOfDataToRowList() {
+    for (int i = 0; i <= _originalTestCase.length; i++) {
+      _rowList.add(
+        TestCaseRowData(
+          parentData: null,
+          isGroup: _originalTestCase[i].children != null,
+          testCase: _originalTestCase[i],
+          actualPosition: [i],
+        ),
+      );
+    }
+  }
+
+  void _renderAllDeepChildrenForDownload() {
+    int depth = 0;
+    while (true) {
+      bool foundSomethingToExpand = _findAndExpand(_rowList, depth);
+      if (!foundSomethingToExpand) {
+        break;
+      }
+      depth++;
+    }
+  }
+
+  bool _findAndExpand(List<TestCaseRowData> parentTestCaseList, int depth) {
+    final listToBeCheckedAndExpanded = [...parentTestCaseList];
+    bool foundSomethingToExpand = false;
+    for (var element in listToBeCheckedAndExpanded) {
+      if (_findWhetherItCanExpand(depth, element)) {
+        foundSomethingToExpand = true;
+        expandChildren(parentTestCase: element, removeSiblings: false);
+      }
+    }
+    return foundSomethingToExpand;
+  }
+
+  bool _findWhetherItCanExpand(int depth, TestCaseRowData element) {
+    if (depth == 0 && element.testCase.children != null) return true;
+    assert(element.parentData != null,
+        "Parent Data null means there is some error while inserting the data");
+    if (element.parentData == null) return false;
+    if (depth > 0 && element.parentData!.actualParentLocation.length == 1)
+      return true;
+    return false;
   }
 }
