@@ -121,7 +121,8 @@ class TestCaseDataController {
     List<TestCaseRowData> expandedData = [];
     final children = parentActualData.children ?? [];
     for (int i = 0; i < children.length; i++) {
-      ChildType childType = _getChildType(i: i, children: children);
+      ChildType childType =
+          _getChildType(i: i, familyMembersLength: children.length);
       expandedData.add(
         TestCaseRowData(
           parentData: ParentData(
@@ -143,12 +144,12 @@ class TestCaseDataController {
 
   ChildType _getChildType({
     required int i,
-    required List<TestCase> children,
+    required int familyMembersLength,
   }) {
     ChildType childType = ChildType.mid;
     if (i == 0) {
       childType = ChildType.first;
-    } else if (i == children.length - 1) {
+    } else if (i == familyMembersLength - 1) {
       childType = ChildType.last;
     }
     return childType;
@@ -170,9 +171,60 @@ class TestCaseDataController {
     ];
   }
 
-  void goBack(List<int> parentsIndex) {
+  ///Every children have its parentsActualLocation,
+  ///
+  /// Say Group 1 have Children Test 1 and Group 2.
+  ///
+  /// And Group 2 have Children Test 2 and Test 3.
+  ///
+  /// And Group 2 is expanded, so Parent Data for Test 2 is (0,1)
+  ///
+  /// whichParentIndex index 0 means (0,1)'s index 0 aka Grand Parent of Test 2
+  /// and whichParentIndex index 1 means (0,1)'s index 1 aka Parent of Test 2
+  ///
+  /// But whichParentIndex is 1 aka Parent, its already opened, so it will perform no effect
+  ///
+  /// Assume: () bracket denotes List bracket for this documentation
+  void goBack(List<int> parentsActualLocation, int whichParentIndex) {
+    if (whichParentIndex == parentsActualLocation.length - 1) return;
     renderTableData();
-    final grandParentIndex = [...parentsIndex];
-    grandParentIndex.removeLast();
+    final newParentLocation =
+        parentsActualLocation.sublist(0, whichParentIndex + 1);
+    var elementToBeExpanded = testCaseWidgetList[newParentLocation.first];
+    for (int whichParentLocalLoop = 0;
+        whichParentLocalLoop < newParentLocation.length;
+        whichParentLocalLoop++) {
+      final elementToBeExpandedLocal = elementToBeExpanded.copyWith();
+      expandChildren(parentTestCase: elementToBeExpandedLocal);
+
+      int nextLoopIndex = whichParentLocalLoop + 1;
+      if (nextLoopIndex < newParentLocation.length) {
+        final nextElementTestCase = (elementToBeExpanded.testCase.children ??
+            [])[newParentLocation[nextLoopIndex]];
+        elementToBeExpanded = TestCaseRowData(
+          parentData: ParentData(
+            childType: _getChildType(
+                i: newParentLocation[nextLoopIndex],
+                familyMembersLength:
+                    (elementToBeExpanded.testCase.children ?? []).length),
+            parents: [
+              if (whichParentLocalLoop == 0)
+                elementToBeExpanded.testCase.testName
+              else ...[
+                ...elementToBeExpanded.parentData!.parents,
+                elementToBeExpanded.testCase.testName
+              ]
+            ],
+            actualParentLocation: elementToBeExpanded.actualPosition,
+          ),
+          isGroup: nextElementTestCase.children != null,
+          testCase: nextElementTestCase,
+          actualPosition: [
+            ...elementToBeExpanded.actualPosition,
+            newParentLocation[nextLoopIndex],
+          ],
+        );
+      }
+    }
   }
 }

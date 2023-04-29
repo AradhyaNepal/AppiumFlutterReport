@@ -18,6 +18,14 @@ class TestCaseRowData {
     required this.testCase,
     required this.actualPosition,
   }) : assert(!isGroup && parentData != null, "Only Group Can Have Child Data");
+
+  TestCaseRowData copyWith() {
+    return TestCaseRowData(
+        parentData: parentData,
+        isGroup: isGroup,
+        testCase: testCase,
+        actualPosition: actualPosition);
+  }
 }
 
 class ParentData {
