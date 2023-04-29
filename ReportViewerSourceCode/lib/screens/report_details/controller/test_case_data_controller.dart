@@ -16,6 +16,7 @@ class TestCaseDataController {
           actualPosition: [i],
           parentData: null,
           isGroup: report.result[i].children != null,
+          testCase: report.result[i],
         ),
       );
     }
@@ -24,14 +25,12 @@ class TestCaseDataController {
   void expandChildren({
     required TestCaseRowData parentTestCase,
   }) {
-    final actualParent =
-        _getTestCaseFromActualPosition(parentTestCase.actualPosition);
-    if (actualParent.children == null) return;
-    if ((actualParent.children ?? []).isEmpty) return;
+    if (parentTestCase.testCase.children == null) return;
+    if ((parentTestCase.testCase.children ?? []).isEmpty) return;
 
     List<TestCaseRowData> expandedData = _getExpandedChildList(
       parentRowData: parentTestCase,
-      parentActualData: actualParent,
+      parentActualData: parentTestCase.testCase,
     );
 
     _removeSiblingsOfExpandedParentExceptRoot(
@@ -135,18 +134,11 @@ class TestCaseDataController {
           ),
           isGroup: children[i].children != null,
           actualPosition: [...parentRowData.actualPosition, i],
+          testCase: children[i],
         ),
       );
     }
     return expandedData;
-  }
-
-  TestCase _getTestCaseFromActualPosition(List<int> actualPosition) {
-    dynamic value;
-    for (var i in actualPosition) {
-      value = report.result[i];
-    }
-    return value;
   }
 
   ChildType _getChildType({
@@ -166,6 +158,7 @@ class TestCaseDataController {
     required TestCaseRowData parentTestCase,
     required List<TestCaseRowData> expandedData,
   }) {
+    int parentIndex = _getParentIndex(parentTestCase.actualPosition);
     bool isNotFirst = parentIndex != 0;
     bool isNotLast = parentIndex != testCaseWidgetList.length - 1;
     testCaseWidgetList = [

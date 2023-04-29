@@ -49,7 +49,9 @@ class ReportDetailsScreen extends StatelessWidget {
               ],
             )),
             const SearchWidget(),
-            const SliverTestCaseTableWidget(),
+            SliverTestCaseTableWidget(
+              report: report,
+            ),
           ],
         ),
       ),

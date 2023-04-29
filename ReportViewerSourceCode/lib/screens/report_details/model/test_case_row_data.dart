@@ -1,3 +1,5 @@
+import '../../../model/test_case.dart';
+
 enum ChildType {
   first,
   mid,
@@ -8,10 +10,12 @@ class TestCaseRowData {
   final ParentData? parentData;
   final bool isGroup;
   final List<int> actualPosition;
+  final TestCase testCase;
 
   TestCaseRowData({
     required this.parentData,
     required this.isGroup,
+    required this.testCase,
     required this.actualPosition,
   }) : assert(!isGroup && parentData != null, "Only Group Can Have Child Data");
 }
