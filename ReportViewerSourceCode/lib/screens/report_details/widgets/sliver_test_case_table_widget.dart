@@ -13,7 +13,7 @@ class SliverTestCaseTableWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final list = TestCaseDataController(report).testCaseWidgetList;
+    final list = TestCaseDataController(report.result).rowList;
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (context, index) {
