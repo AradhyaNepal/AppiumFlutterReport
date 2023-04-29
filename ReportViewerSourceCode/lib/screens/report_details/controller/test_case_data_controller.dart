@@ -185,46 +185,34 @@ class TestCaseDataController {
   /// But whichParentIndex is 1 aka Parent, its already opened, so it will perform no effect
   ///
   /// Assume: () bracket denotes List bracket for this documentation
-  void goBack(List<int> parentsActualLocation, int whichParentIndex) {
-    if (whichParentIndex == parentsActualLocation.length - 1) return;
-    renderTableData();
+  void goBack(TestCaseRowData nearestParent, int whichParentLocationIndex) {
+    if (whichParentLocationIndex == nearestParent.actualPosition.length - 1) {
+      return;
+    }
     final newParentLocation =
-        parentsActualLocation.sublist(0, whichParentIndex + 1);
-    var elementToBeExpanded = testCaseWidgetList[newParentLocation.first];
-    for (int whichParentLocalLoop = 0;
-        whichParentLocalLoop < newParentLocation.length;
-        whichParentLocalLoop++) {
-      final elementToBeExpandedLocal = elementToBeExpanded.copyWith();
-      expandChildren(parentTestCase: elementToBeExpandedLocal);
-
-      int nextLoopIndex = whichParentLocalLoop + 1;
-      if (nextLoopIndex < newParentLocation.length) {
-        final nextElementTestCase = (elementToBeExpanded.testCase.children ??
-            [])[newParentLocation[nextLoopIndex]];
-        elementToBeExpanded = TestCaseRowData(
-          parentData: ParentData(
-            childType: _getChildType(
-                i: newParentLocation[nextLoopIndex],
-                familyMembersLength:
-                    (elementToBeExpanded.testCase.children ?? []).length),
-            parents: [
-              if (whichParentLocalLoop == 0)
-                elementToBeExpanded.testCase.testName
-              else ...[
-                ...elementToBeExpanded.parentData!.parents,
-                elementToBeExpanded.testCase.testName
-              ]
-            ],
-            actualParentLocation: elementToBeExpanded.actualPosition,
-          ),
-          isGroup: nextElementTestCase.children != null,
-          testCase: nextElementTestCase,
-          actualPosition: [
-            ...elementToBeExpanded.actualPosition,
-            newParentLocation[nextLoopIndex],
-          ],
-        );
+        nearestParent.actualPosition.sublist(0, whichParentLocationIndex + 1);
+    bool weFoundTheStaringOfRemoval = false;
+    for (int i = 0; i < testCaseWidgetList.length; i++) {
+      if (testCaseWidgetList[i].parentData == null) continue;
+      bool elementHaveGeneOfNewParent = testCaseWidgetList[i]
+              .parentData!
+              .actualParentLocation
+              .sublist(0, newParentLocation.length)
+              .toString() ==
+          newParentLocation.toString();
+      if (elementHaveGeneOfNewParent) {
+        testCaseWidgetList.removeAt(i);
+        weFoundTheStaringOfRemoval = true;
+      } else if (weFoundTheStaringOfRemoval) {
+        //  The items are stored in a sequence so,
+        // Once we had found starting of removal and no more element starts to be found
+        // Then there will not be any element next
+        break;
       }
     }
+    //Expand Children also restore newParentLocation's Siblings which were deleted previously.
+    expandChildren(
+        parentTestCase: testCaseWidgetList.firstWhere((element) =>
+            element.actualPosition.toString() == newParentLocation.toString()));
   }
 }
