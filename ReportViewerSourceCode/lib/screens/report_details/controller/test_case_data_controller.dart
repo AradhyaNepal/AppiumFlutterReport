@@ -37,6 +37,15 @@ class TestCaseDataController with ChangeNotifier {
     notifyListeners();
   }
 
+  ///Say the testcase tree are like, CRUD (0) > Create (0,0) > Offline (0,0,0) > Test 1 (0,0,0,0)
+  ///and from Test 1 we had pressed goBack,
+  ///
+  ///In this case targetedParentDepth:
+  /// * 0 means minimize the root "CRUD" group
+  /// * 1 means view tests and groups of "CRUD" group
+  /// * 2 means view tests and group of "Create" group
+  /// * 3 means view tests and group of "Offline" group, but currently offline group is already expanded,
+  /// so no effect will happen.
   void goBack({
     required List<int> nearestParentPosition,
     required int targetedParentDepth,
