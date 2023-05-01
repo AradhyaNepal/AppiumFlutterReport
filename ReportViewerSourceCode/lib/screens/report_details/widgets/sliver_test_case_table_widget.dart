@@ -38,22 +38,38 @@ class TestCaseRowWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Row(
+        Column(
           children: [
             Builder(
                 builder: (context){
-                  if(data.parentData==null)return const SizedBox();
+                  final parent=data.parentData;
+                  if(parent==null)return const SizedBox();
                   return Row(
                     children: [
-                      for (int position=0;position<data.parentData!.actualParent.actualPosition.length;position++)
-                        IconButton(
-                          onPressed: (){
-                            Provider.of<TestCaseDataController>(context,listen: false).goBack(data.parentData!.actualParentLocation, position);
-                          },
-                          icon: Icon(
-                            Icons.backspace,
-                          ),
-                        )
+                      IconButton(
+                        onPressed: (){
+                          Provider.of<TestCaseDataController>(context,listen: false).goBack(
+                            nearestParentPosition: parent.actualParent.actualPosition,
+                            targetedParentDepth: parent.actualParent.actualPosition.length-1,
+                          );
+                        },
+                        icon: const Icon(
+                          Icons.backspace,
+                        ),
+                      ),
+                      for (int depth=1;depth<=data.parentData!.actualParent.actualPosition.length;depth++)
+                        TextButton(
+                            onPressed: (){
+                              Provider.of<TestCaseDataController>(context,listen: false).goBack(
+                                  nearestParentPosition: parent.actualParent.actualPosition,
+                                  targetedParentDepth: depth,
+                              );
+                            },
+                            child: Text(
+                              parent.parents[depth],
+                            ),
+                        ),
+
                     ],
                   );
 
@@ -61,6 +77,10 @@ class TestCaseRowWidget extends StatelessWidget {
                 },
             ),
             Text(data.testCase.testName),
+            const Divider(
+              height: 1,
+              color: Colors.red,
+            ),
           ],
         ),
         data.isGroup?IconButton(

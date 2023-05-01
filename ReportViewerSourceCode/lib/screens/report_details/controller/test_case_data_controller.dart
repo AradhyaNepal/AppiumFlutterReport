@@ -41,21 +41,57 @@ class TestCaseDataController with ChangeNotifier {
     required List<int> nearestParentPosition,
     required int targetedParentDepth,
   }) {
-    if (nearestParentPosition.length == targetedParentDepth) return;
-    final targetedParentLocation =
+    if (nearestParentPosition.length == targetedParentDepth) return;//We are expanding same expanded group
+    final targetedGroupLocation =
         nearestParentPosition.sublist(0, targetedParentDepth);
-    final targetedParentRow=_removeChildAndAddTargetedParent(targetedParentLocation);
-    if(targetedParentRow==null){
+    bool forMinimizingTheRootGroup = _setupForRootGroupMinimizing(
+        targetedGroupLocation: targetedGroupLocation,
+        nearestParentPosition: nearestParentPosition,
+        targetedParentDepth: targetedParentDepth);
+    final targetedGroupRow =
+        _removeChildAndAddTargetedParent(targetedGroupLocation);
+    _checkAndExpandTargetedGroup(
+      targetedGroupRow: targetedGroupRow,
+      forMinimizingTheRootGroup: forMinimizingTheRootGroup,
+    );
+    notifyListeners();
+  }
+
+  ///Returns whether the purpose of going back is to minimize the root group, using back button.
+  ///
+  /// Also in setup, if increase the targetedGroupLocation value to root group from which its minimizing
+  ///
+  /// So after this step we are supposed to remove that minimizing root's children and add the rood group.
+  ///
+  /// And we need to make sure that we are not expanding root group, because we are here to minimize it.
+  bool _setupForRootGroupMinimizing({
+    required List<int> targetedGroupLocation,
+    required List<int> nearestParentPosition,
+    required int targetedParentDepth,
+  }) {
+    bool forMinimizingTheRootGroup = targetedGroupLocation.isEmpty;
+    if (forMinimizingTheRootGroup) {
+      targetedGroupLocation.add(nearestParentPosition[targetedParentDepth + 1]);
+    }
+    return forMinimizingTheRootGroup;
+  }
+
+  void _checkAndExpandTargetedGroup({
+    required TestCaseRow? targetedGroupRow,
+    required bool forMinimizingTheRootGroup,
+  }) {
+    if (forMinimizingTheRootGroup) return;
+    if (targetedGroupRow == null) {
       if (kDebugMode) {
         print("Cannot find Targeted Parent");
       }
       return;
     }
-    expandChildren(parentTestCase: targetedParentRow);
-    notifyListeners();
+    expandChildren(parentTestCase: targetedGroupRow);
   }
 
-  TestCaseRow? _removeChildAndAddTargetedParent(List<int> targetedParentLocation) {
+  TestCaseRow? _removeChildAndAddTargetedParent(
+      List<int> targetedGroupLocation) {
     int? removeStart, removeEnd;
     TestCaseRow? targetedParentRow;
     for (int i = 0; i < rowList.length; i++) {
@@ -63,13 +99,14 @@ class TestCaseDataController with ChangeNotifier {
       if (parentData == null) continue;
       final parentRow = parentData.actualParent;
       bool elementHaveGeneOfTargetedParent = parentRow.actualPosition
-              .sublist(0, targetedParentLocation.length)
+              .sublist(0, targetedGroupLocation.length)
               .toString() ==
-          targetedParentLocation.toString();
+          targetedGroupLocation.toString();
       if (elementHaveGeneOfTargetedParent) {
         removeStart ??= i;
         removeEnd = i;
-        targetedParentRow = _extractTargetedRow(targetedParentRow, parentRow, targetedParentLocation);
+        targetedParentRow = _extractTargetedRow(
+            targetedParentRow, parentRow, targetedGroupLocation);
       } else if (removeStart != null) {
         //  The items are stored in a sequence so,
         // Once we had found starting of removal and no more element starts to be found
@@ -78,9 +115,8 @@ class TestCaseDataController with ChangeNotifier {
       }
     }
 
-    if (removeStart == null ||
-        removeEnd == null ||
-        targetedParentRow == null) return null;
+    if (removeStart == null || removeEnd == null || targetedParentRow == null)
+      return null;
 
     //Removes Child
     rowList.removeRange(removeStart, removeEnd + 1);
@@ -91,7 +127,8 @@ class TestCaseDataController with ChangeNotifier {
   }
 
   ///Extract only if its not already extracted
-  TestCaseRow? _extractTargetedRow(TestCaseRow? targetedParentRowToExtract, TestCaseRow loopParentRow, List<int> targetedParentLocation) {
+  TestCaseRow? _extractTargetedRow(TestCaseRow? targetedParentRowToExtract,
+      TestCaseRow loopParentRow, List<int> targetedParentLocation) {
     if (targetedParentRowToExtract == null &&
         loopParentRow.actualPosition.toString() ==
             targetedParentLocation.toString()) {
