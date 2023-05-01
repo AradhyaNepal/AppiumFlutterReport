@@ -1,5 +1,6 @@
 import 'package:appium_report/model/test_case.dart';
 import 'package:appium_report/screens/report_details/model/test_case_row_data.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class TestCaseDataController with ChangeNotifier {
@@ -36,68 +37,67 @@ class TestCaseDataController with ChangeNotifier {
     notifyListeners();
   }
 
-  ///Every children have its parentsActualLocation,
-  ///
-  /// Say Group 1 have Children Test 1 and Group 2.
-  ///
-  /// And Group 2 have Children Test 2 and Test 3.
-  ///
-  /// And Group 2 is expanded, so Parent Data for Test 2 is (0,1)
-  ///
-  /// whichParentIndex index 0 means (0,1)'s index 0 aka Grand Parent of Test 2
-  /// and whichParentIndex index 1 means (0,1)'s index 1 aka Parent of Test 2
-  ///
-  /// But whichParentIndex is 1 aka Parent, its already opened, so it will perform no effect
-  ///
-  /// Assume: () bracket denotes List bracket for this documentation
-  void goBack(List<int> parentUILocation, int whichParentLocationIndex) {
-    if (whichParentLocationIndex == parentUILocation.length - 1) {
+  void goBack({
+    required List<int> nearestParentPosition,
+    required int targetedParentDepth,
+  }) {
+    if (nearestParentPosition.length == targetedParentDepth) return;
+    final targetedParentLocation =
+        nearestParentPosition.sublist(0, targetedParentDepth);
+    final targetedParentRow=_removeChildAndAddTargetedParent(targetedParentLocation);
+    if(targetedParentRow==null){
+      if (kDebugMode) {
+        print("Cannot find Targeted Parent");
+      }
       return;
     }
-    final newParentLocation =
-        parentUILocation.sublist(0, whichParentLocationIndex + 1);
-    bool weFoundTheStaringOfRemoval = false;
+    expandChildren(parentTestCase: targetedParentRow);
+    notifyListeners();
+  }
+
+  TestCaseRow? _removeChildAndAddTargetedParent(List<int> targetedParentLocation) {
     int? removeStart, removeEnd;
+    TestCaseRow? targetedParentRow;
     for (int i = 0; i < rowList.length; i++) {
-      if (rowList[i].parentData == null) continue;
-      bool elementHaveGeneOfNewParent = rowList[i]
-              .parentData!
-              .actualParent.actualPosition
-              .sublist(0, newParentLocation.length)
+      final parentData = rowList[i].parentData;
+      if (parentData == null) continue;
+      final parentRow = parentData.actualParent;
+      bool elementHaveGeneOfTargetedParent = parentRow.actualPosition
+              .sublist(0, targetedParentLocation.length)
               .toString() ==
-          newParentLocation.toString();
-      if (elementHaveGeneOfNewParent) {
-        weFoundTheStaringOfRemoval = true;
+          targetedParentLocation.toString();
+      if (elementHaveGeneOfTargetedParent) {
         removeStart ??= i;
         removeEnd = i;
-      } else if (weFoundTheStaringOfRemoval) {
+        targetedParentRow = _extractTargetedRow(targetedParentRow, parentRow, targetedParentLocation);
+      } else if (removeStart != null) {
         //  The items are stored in a sequence so,
         // Once we had found starting of removal and no more element starts to be found
         // Then there will not be any element next
         break;
       }
     }
-    if (removeStart == null || removeEnd == null) return;
+
+    if (removeStart == null ||
+        removeEnd == null ||
+        targetedParentRow == null) return null;
+
+    //Removes Child
     rowList.removeRange(removeStart, removeEnd + 1);
-    // rowList.insert(
-    //     removeStart,
-    //     TestCaseRow(
-    //       parentData: newParentLocation.length == 1
-    //           ? null
-    //           : ParentData(
-    //               actualParentLocation: [],
-    //               childType: _getChildType(i: i, familyMembersLength: familyMembersLength),
-    //               parents: [],
-    //             ),
-    //       isGroup: isGroup,
-    //       testCase: testCase,
-    //       actualPosition: actualPosition,
-    //     ));
-    //Expand Children used to restore newParentLocation's Siblings which were deleted previously.
-    // expandChildren(
-    //     parentTestCase: rowList.firstWhere((element) =>
-    //         element.actualPosition.toString() == newParentLocation.toString()));
-    notifyListeners();
+
+    //Inside the first removed child index, adds the parent
+    rowList.insert(removeStart, targetedParentRow);
+    return targetedParentRow;
+  }
+
+  ///Extract only if its not already extracted
+  TestCaseRow? _extractTargetedRow(TestCaseRow? targetedParentRowToExtract, TestCaseRow loopParentRow, List<int> targetedParentLocation) {
+    if (targetedParentRowToExtract == null &&
+        loopParentRow.actualPosition.toString() ==
+            targetedParentLocation.toString()) {
+      targetedParentRowToExtract = loopParentRow;
+    }
+    return targetedParentRowToExtract;
   }
 
   void _renderFirstRoot() {
