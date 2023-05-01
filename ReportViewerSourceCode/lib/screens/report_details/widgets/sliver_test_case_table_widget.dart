@@ -27,7 +27,7 @@ class SliverTestCaseTableWidget extends StatelessWidget {
 }
 
 class TestCaseRowWidget extends StatelessWidget {
-  final TestCaseRowData data;
+  final TestCaseRow data;
 
   const TestCaseRowWidget({
     required this.data,
@@ -45,7 +45,7 @@ class TestCaseRowWidget extends StatelessWidget {
                   if(data.parentData==null)return const SizedBox();
                   return Row(
                     children: [
-                      for (int position=0;position<data.parentData!.actualParentLocation.length;position++)
+                      for (int position=0;position<data.parentData!.actualParent.actualPosition.length;position++)
                         IconButton(
                           onPressed: (){
                             Provider.of<TestCaseDataController>(context,listen: false).goBack(data.parentData!.actualParentLocation, position);

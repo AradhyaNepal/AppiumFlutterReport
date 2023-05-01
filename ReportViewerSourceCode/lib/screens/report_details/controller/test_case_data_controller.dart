@@ -3,7 +3,7 @@ import 'package:appium_report/screens/report_details/model/test_case_row_data.da
 import 'package:flutter/material.dart';
 
 class TestCaseDataController with ChangeNotifier {
-  List<TestCaseRowData> rowList = [];
+  List<TestCaseRow> rowList = [];
 
   final List<TestCase> _originalTestCase;
 
@@ -11,15 +11,14 @@ class TestCaseDataController with ChangeNotifier {
     _renderFirstRoot();
   }
 
-
   void expandChildren({
-    required TestCaseRowData parentTestCase,
+    required TestCaseRow parentTestCase,
     bool removeSiblingsAndRemoveParent = true,
   }) {
     if (parentTestCase.testCase.children == null) return;
     if ((parentTestCase.testCase.children ?? []).isEmpty) return;
 
-    List<TestCaseRowData> expandedData = _getExpandedChildList(
+    List<TestCaseRow> expandedData = _getExpandedChildList(
       parentRowData: parentTestCase,
       parentActualData: parentTestCase.testCase,
     );
@@ -51,24 +50,26 @@ class TestCaseDataController with ChangeNotifier {
   /// But whichParentIndex is 1 aka Parent, its already opened, so it will perform no effect
   ///
   /// Assume: () bracket denotes List bracket for this documentation
-  void goBack(List<int> parentLocation, int whichParentLocationIndex) {
-    if (whichParentLocationIndex == parentLocation.length - 1) {
+  void goBack(List<int> parentUILocation, int whichParentLocationIndex) {
+    if (whichParentLocationIndex == parentUILocation.length - 1) {
       return;
     }
     final newParentLocation =
-    parentLocation.sublist(0, whichParentLocationIndex + 1);
+        parentUILocation.sublist(0, whichParentLocationIndex + 1);
     bool weFoundTheStaringOfRemoval = false;
+    int? removeStart, removeEnd;
     for (int i = 0; i < rowList.length; i++) {
       if (rowList[i].parentData == null) continue;
       bool elementHaveGeneOfNewParent = rowList[i]
               .parentData!
-              .actualParentLocation
+              .actualParent.actualPosition
               .sublist(0, newParentLocation.length)
               .toString() ==
           newParentLocation.toString();
       if (elementHaveGeneOfNewParent) {
-        rowList.removeAt(i);
         weFoundTheStaringOfRemoval = true;
+        removeStart ??= i;
+        removeEnd = i;
       } else if (weFoundTheStaringOfRemoval) {
         //  The items are stored in a sequence so,
         // Once we had found starting of removal and no more element starts to be found
@@ -76,6 +77,22 @@ class TestCaseDataController with ChangeNotifier {
         break;
       }
     }
+    if (removeStart == null || removeEnd == null) return;
+    rowList.removeRange(removeStart, removeEnd + 1);
+    // rowList.insert(
+    //     removeStart,
+    //     TestCaseRow(
+    //       parentData: newParentLocation.length == 1
+    //           ? null
+    //           : ParentData(
+    //               actualParentLocation: [],
+    //               childType: _getChildType(i: i, familyMembersLength: familyMembersLength),
+    //               parents: [],
+    //             ),
+    //       isGroup: isGroup,
+    //       testCase: testCase,
+    //       actualPosition: actualPosition,
+    //     ));
     //Expand Children used to restore newParentLocation's Siblings which were deleted previously.
     // expandChildren(
     //     parentTestCase: rowList.firstWhere((element) =>
@@ -83,13 +100,11 @@ class TestCaseDataController with ChangeNotifier {
     notifyListeners();
   }
 
-
-
   void _renderFirstRoot() {
     rowList.clear();
     for (int i = 0; i < _originalTestCase.length; i++) {
       rowList.add(
-        TestCaseRowData(
+        TestCaseRow(
           actualPosition: [i],
           parentData: null,
           isGroup: _originalTestCase[i].children != null,
@@ -105,24 +120,24 @@ class TestCaseDataController with ChangeNotifier {
     _renderAllDeepChildrenForDownload();
   }
 
-  List<TestCaseRowData> _getExpandedChildList({
-    required TestCaseRowData parentRowData,
+  List<TestCaseRow> _getExpandedChildList({
+    required TestCaseRow parentRowData,
     required TestCase parentActualData,
   }) {
-    List<TestCaseRowData> expandedData = [];
+    List<TestCaseRow> expandedData = [];
     final children = parentActualData.children ?? [];
     for (int i = 0; i < children.length; i++) {
       ChildType childType =
           _getChildType(i: i, familyMembersLength: children.length);
       expandedData.add(
-        TestCaseRowData(
+        TestCaseRow(
           parentData: ParentData(
             childType: childType,
             parents: [
               ...parentRowData.parentData?.parents ?? [],
               parentActualData.testName,
             ],
-            actualParentLocation: parentRowData.actualPosition,
+            actualParent: parentRowData,
           ),
           isGroup: children[i].children != null,
           actualPosition: [...parentRowData.actualPosition, i],
@@ -168,11 +183,11 @@ class TestCaseDataController with ChangeNotifier {
     grandParentIndex.removeLast();
     final String grandParentIndexString = grandParentIndex.toString();
     int parentUIIndex = _getParentIndex(actualParentLocation);
-    _removeAfterParentData(parentUIIndex, grandParentIndexString);
-    _removeBeforeParentData(parentUIIndex, grandParentIndexString);
+    _removeAfterParentSiblings(parentUIIndex, grandParentIndexString);
+    _removeBeforeParentSiblings(parentUIIndex, grandParentIndexString);
   }
 
-  void _removeAfterParentData(int parentUIIndex, String grandParentIndex) {
+  void _removeAfterParentSiblings(int parentUIIndex, String grandParentIndex) {
     if (parentUIIndex + 1 >= rowList.length) return;
     int? removeStart;
     int? removeEnd;
@@ -180,7 +195,7 @@ class TestCaseDataController with ChangeNotifier {
       if (rowList[i].parentData == null) {
         break;
       }
-      if (rowList[i].parentData?.actualParentLocation.toString() ==
+      if (rowList[i].parentData?.actualParent.actualPosition.toString() ==
           grandParentIndex) {
         removeStart ??= i;
         removeEnd = i;
@@ -193,14 +208,14 @@ class TestCaseDataController with ChangeNotifier {
     }
   }
 
-  void _removeBeforeParentData(int parentUIIndex, String grandParentIndex) {
+  void _removeBeforeParentSiblings(int parentUIIndex, String grandParentIndex) {
     if (parentUIIndex - 1 <= 0) return;
-    int? removeStart,removeEnd;
+    int? removeStart, removeEnd;
     for (int i = parentUIIndex - 1; i >= 0; i--) {
       if (rowList[i].parentData == null) {
         break;
       }
-      if (rowList[i].parentData?.actualParentLocation.toString() ==
+      if (rowList[i].parentData?.actualParent.actualPosition.toString() ==
           grandParentIndex) {
         removeStart = i;
         removeEnd ??= i;
@@ -214,16 +229,16 @@ class TestCaseDataController with ChangeNotifier {
   }
 
   void _updateUIListWithNewExpandedChildList({
-    required TestCaseRowData parentTestCase,
-    required List<TestCaseRowData> expandedData,
-    bool preserveSelf=true,
+    required TestCaseRow parentTestCase,
+    required List<TestCaseRow> expandedData,
+    bool preserveSelf = true,
   }) {
     int parentIndex = _getParentIndex(parentTestCase.actualPosition);
     bool isNotFirst = parentIndex != 0;
     bool isNotLast = parentIndex != rowList.length - 1;
     rowList = [
       if (isNotFirst) ...rowList.sublist(0, parentIndex),
-      if(preserveSelf)parentTestCase,
+      if (preserveSelf) parentTestCase,
       ...expandedData,
       if (isNotLast) ...rowList.sublist(parentIndex + 1, rowList.length),
     ];
@@ -248,7 +263,7 @@ class TestCaseDataController with ChangeNotifier {
     }
   }
 
-  bool _findAndExpand(List<TestCaseRowData> parentTestCaseList, int depth) {
+  bool _findAndExpand(List<TestCaseRow> parentTestCaseList, int depth) {
     final listToBeCheckedAndExpanded = [...parentTestCaseList];
     bool foundSomethingToExpand = false;
     for (var element in listToBeCheckedAndExpanded) {
@@ -256,7 +271,8 @@ class TestCaseDataController with ChangeNotifier {
       if (element.testCase.children == null) continue;
       if (element.testCase.children!.isEmpty) continue;
       foundSomethingToExpand = true;
-      expandChildren(parentTestCase: element, removeSiblingsAndRemoveParent: false);
+      expandChildren(
+          parentTestCase: element, removeSiblingsAndRemoveParent: false);
     }
     return foundSomethingToExpand;
   }

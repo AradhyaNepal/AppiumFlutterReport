@@ -6,21 +6,21 @@ enum ChildType {
   last,
 }
 
-class TestCaseRowData {
+class TestCaseRow {
   final ParentData? parentData;
   final bool isGroup;
   final List<int> actualPosition;
   final TestCase testCase;
 
-  TestCaseRowData({
+  TestCaseRow({
     required this.parentData,
     required this.isGroup,
     required this.testCase,
     required this.actualPosition,
   });
 
-  TestCaseRowData copyWith() {
-    return TestCaseRowData(
+  TestCaseRow copyWith() {
+    return TestCaseRow(
         parentData: parentData,
         isGroup: isGroup,
         testCase: testCase,
@@ -29,14 +29,13 @@ class TestCaseRowData {
 }
 
 class ParentData {
-  ///Index from first element as first parent to last element as last parent
-  List<int> actualParentLocation;
+  TestCaseRow actualParent;
   List<String> parents;
   ChildType childType;
 
   ParentData({
     required this.childType,
     required this.parents,
-    required this.actualParentLocation,
+    required this.actualParent,
   });
 }
