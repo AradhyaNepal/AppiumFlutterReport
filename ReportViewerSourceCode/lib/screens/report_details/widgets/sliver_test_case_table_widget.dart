@@ -44,7 +44,7 @@ class TestCaseRowWidget extends StatelessWidget {
                 builder: (context){
                   final parent=data.parentData;
                   if(parent==null)return const SizedBox();
-                  return Row(
+                  return parent.childType==ChildType.first?Row(
                     children: [
                       IconButton(
                         onPressed: (){
@@ -66,21 +66,17 @@ class TestCaseRowWidget extends StatelessWidget {
                               );
                             },
                             child: Text(
-                              parent.parents[depth],
+                              parent.parents[depth-1],
                             ),
                         ),
 
                     ],
-                  );
+                  ):const SizedBox();
 
 
                 },
             ),
             Text(data.testCase.testName),
-            const Divider(
-              height: 1,
-              color: Colors.red,
-            ),
           ],
         ),
         data.isGroup?IconButton(

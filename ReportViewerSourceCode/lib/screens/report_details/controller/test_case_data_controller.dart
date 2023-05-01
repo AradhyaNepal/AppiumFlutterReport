@@ -71,7 +71,7 @@ class TestCaseDataController with ChangeNotifier {
   }) {
     bool forMinimizingTheRootGroup = targetedGroupLocation.isEmpty;
     if (forMinimizingTheRootGroup) {
-      targetedGroupLocation.add(nearestParentPosition[targetedParentDepth + 1]);
+      targetedGroupLocation.add(nearestParentPosition[targetedParentDepth]);
     }
     return forMinimizingTheRootGroup;
   }
@@ -93,7 +93,7 @@ class TestCaseDataController with ChangeNotifier {
   TestCaseRow? _removeChildAndAddTargetedParent(
       List<int> targetedGroupLocation) {
     int? removeStart, removeEnd;
-    TestCaseRow? targetedParentRow;
+    TestCaseRow? nearestTargetedParentRelative;
     for (int i = 0; i < rowList.length; i++) {
       final parentData = rowList[i].parentData;
       if (parentData == null) continue;
@@ -105,8 +105,7 @@ class TestCaseDataController with ChangeNotifier {
       if (elementHaveGeneOfTargetedParent) {
         removeStart ??= i;
         removeEnd = i;
-        targetedParentRow = _extractTargetedRow(
-            targetedParentRow, parentRow, targetedGroupLocation);
+        nearestTargetedParentRelative = _checkWhetherParentIsNearestRelative(nearestTargetedParentRelative, parentRow);
       } else if (removeStart != null) {
         //  The items are stored in a sequence so,
         // Once we had found starting of removal and no more element starts to be found
@@ -115,27 +114,43 @@ class TestCaseDataController with ChangeNotifier {
       }
     }
 
-    if (removeStart == null || removeEnd == null || targetedParentRow == null)
+    if (removeStart == null || removeEnd == null){
       return null;
-
+    }
     //Removes Child
     rowList.removeRange(removeStart, removeEnd + 1);
 
+    if(nearestTargetedParentRelative==null) return null;
+    final actualParentRow=_getActualParentRow(nearestTargetedParentRelative,targetedGroupLocation.toString());
+    if(actualParentRow==null)return null;
     //Inside the first removed child index, adds the parent
-    rowList.insert(removeStart, targetedParentRow);
-    return targetedParentRow;
+    rowList.insert(removeStart, actualParentRow);
+    return actualParentRow;
   }
 
-  ///Extract only if its not already extracted
-  TestCaseRow? _extractTargetedRow(TestCaseRow? targetedParentRowToExtract,
-      TestCaseRow loopParentRow, List<int> targetedParentLocation) {
-    if (targetedParentRowToExtract == null &&
-        loopParentRow.actualPosition.toString() ==
-            targetedParentLocation.toString()) {
-      targetedParentRowToExtract = loopParentRow;
+  TestCaseRow? _getActualParentRow(TestCaseRow nearestRow,String expectedLocationString) {
+    //Can Trap in infinite Loop
+    // ignore: avoid_print
+    print("Getting Actual Parent");
+    if(nearestRow.actualPosition.toString()==expectedLocationString){
+      return nearestRow;
     }
-    return targetedParentRowToExtract;
+    else{
+      if(nearestRow.parentData==null)return null;
+      return _getActualParentRow(nearestRow.parentData!.actualParent, expectedLocationString);
+    }
   }
+
+  TestCaseRow? _checkWhetherParentIsNearestRelative(TestCaseRow? nearestTargetedParentRelative, TestCaseRow parentRow) {
+    if(nearestTargetedParentRelative==null){
+      nearestTargetedParentRelative=parentRow;
+    }else if(nearestTargetedParentRelative.actualPosition.length<parentRow.actualPosition.length){
+      nearestTargetedParentRelative=parentRow;
+    }
+    return nearestTargetedParentRelative;
+  }
+
+
 
   void _renderFirstRoot() {
     rowList.clear();
