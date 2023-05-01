@@ -193,26 +193,23 @@ class TestCaseDataController with ChangeNotifier {
   }
 
   void _removeBeforeParentData(int parentUIIndex, String grandParentIndex) {
-    int tillWhereGrandParentFound = parentUIIndex;
+    if (parentUIIndex - 1 <=0) return;
+    int? removeStart=null;
+    int? removeEnd=null;
     for (int i = parentUIIndex - 1; i >= 0; i--) {
       if (rowList[i].parentData == null) {
         break;
       }
       if (rowList[i].parentData?.actualParentLocation.toString() ==
           grandParentIndex) {
-        tillWhereGrandParentFound--;
+        removeStart= i;
+        removeEnd??=i;
       } else {
         break;
       }
     }
-
-    if (tillWhereGrandParentFound < parentUIIndex) {
-      rowList = [
-        if (tillWhereGrandParentFound != 0)
-          ...rowList.sublist(0, tillWhereGrandParentFound),
-        if (parentUIIndex != rowList.length - 1)
-          ...rowList.sublist(parentUIIndex, rowList.length),
-      ];
+    if(removeStart!=null && removeEnd!=null){
+      rowList.removeRange(removeStart, removeEnd+1);
     }
   }
 
