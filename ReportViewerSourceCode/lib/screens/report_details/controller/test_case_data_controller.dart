@@ -41,7 +41,7 @@ class TestCaseDataController with ChangeNotifier {
   ///and from Test 1 we had pressed goBack,
   ///
   ///In this case targetedParentDepth:
-  /// * 0 means minimize the root "CRUD" group
+  /// * 0 means minimize the root "CRUD" group (Happens when back button is pressed when CRUD group is expanded)
   /// * 1 means view tests and groups of "CRUD" group
   /// * 2 means view tests and group of "Create" group
   /// * 3 means view tests and group of "Offline" group, but currently offline group is already expanded,
