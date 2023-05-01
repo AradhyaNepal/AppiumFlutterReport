@@ -15,7 +15,6 @@ class SliverTestCaseTableWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final list = Provider.of<TestCaseDataController>(context).rowList;
-    print("Rebuild");
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (context, index) {
@@ -39,7 +38,31 @@ class TestCaseRowWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(data.testCase.testName),
+        Row(
+          children: [
+            Builder(
+                builder: (context){
+                  if(data.parentData==null)return const SizedBox();
+                  return Row(
+                    children: [
+                      for (int position=0;position<data.parentData!.actualParentLocation.length;position++)
+                        IconButton(
+                          onPressed: (){
+                            Provider.of<TestCaseDataController>(context,listen: false).goBack(data.parentData!.actualParentLocation, position);
+                          },
+                          icon: Icon(
+                            Icons.backspace,
+                          ),
+                        )
+                    ],
+                  );
+
+
+                },
+            ),
+            Text(data.testCase.testName),
+          ],
+        ),
         data.isGroup?IconButton(
             onPressed: (){
               if(data.testCase.children==null)return;

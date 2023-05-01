@@ -7,34 +7,14 @@ class TestCaseDataController with ChangeNotifier {
 
   final List<TestCase> _originalTestCase;
 
-
   TestCaseDataController(this._originalTestCase) {
-    optimizedTableRender();
+    _renderFirstRoot();
   }
 
-  void optimizedTableRender() {
-    rowList.clear();
-    for (int i = 0; i < _originalTestCase.length; i++) {
-      rowList.add(
-        TestCaseRowData(
-          actualPosition: [i],
-          parentData: null,
-          isGroup: _originalTestCase[i].children != null,
-          testCase: _originalTestCase[i],
-        ),
-      );
-    }
-  }
-
-  void forDownloadTableRender() {
-    rowList.clear();
-    _insertFirstDepthOfDataToRowList();
-    _renderAllDeepChildrenForDownload();
-  }
 
   void expandChildren({
     required TestCaseRowData parentTestCase,
-    bool removeSiblings = true,
+    bool removeSiblingsAndRemoveParent = true,
   }) {
     if (parentTestCase.testCase.children == null) return;
     if ((parentTestCase.testCase.children ?? []).isEmpty) return;
@@ -44,18 +24,16 @@ class TestCaseDataController with ChangeNotifier {
       parentActualData: parentTestCase.testCase,
     );
 
-
-    if (removeSiblings) {
+    if (removeSiblingsAndRemoveParent) {
       _removeSiblingsOfExpandedParentExceptRoot(
         actualParentLocation: parentTestCase.actualPosition,
       );
-
+    }
     _updateUIListWithNewExpandedChildList(
       parentTestCase: parentTestCase,
       expandedData: expandedData,
+      preserveSelf: !removeSiblingsAndRemoveParent,
     );
-
-    }
     notifyListeners();
   }
 
@@ -73,12 +51,12 @@ class TestCaseDataController with ChangeNotifier {
   /// But whichParentIndex is 1 aka Parent, its already opened, so it will perform no effect
   ///
   /// Assume: () bracket denotes List bracket for this documentation
-  void goBack(TestCaseRowData nearestParent, int whichParentLocationIndex) {
-    if (whichParentLocationIndex == nearestParent.actualPosition.length - 1) {
+  void goBack(List<int> parentLocation, int whichParentLocationIndex) {
+    if (whichParentLocationIndex == parentLocation.length - 1) {
       return;
     }
     final newParentLocation =
-        nearestParent.actualPosition.sublist(0, whichParentLocationIndex + 1);
+    parentLocation.sublist(0, whichParentLocationIndex + 1);
     bool weFoundTheStaringOfRemoval = false;
     for (int i = 0; i < rowList.length; i++) {
       if (rowList[i].parentData == null) continue;
@@ -98,10 +76,33 @@ class TestCaseDataController with ChangeNotifier {
         break;
       }
     }
-    //Expand Children also restore newParentLocation's Siblings which were deleted previously.
-    expandChildren(
-        parentTestCase: rowList.firstWhere((element) =>
-            element.actualPosition.toString() == newParentLocation.toString()));
+    //Expand Children used to restore newParentLocation's Siblings which were deleted previously.
+    // expandChildren(
+    //     parentTestCase: rowList.firstWhere((element) =>
+    //         element.actualPosition.toString() == newParentLocation.toString()));
+    notifyListeners();
+  }
+
+
+
+  void _renderFirstRoot() {
+    rowList.clear();
+    for (int i = 0; i < _originalTestCase.length; i++) {
+      rowList.add(
+        TestCaseRowData(
+          actualPosition: [i],
+          parentData: null,
+          isGroup: _originalTestCase[i].children != null,
+          testCase: _originalTestCase[i],
+        ),
+      );
+    }
+  }
+
+  void _forDownloadTableRender() {
+    rowList.clear();
+    _renderFirstRoot();
+    _renderAllDeepChildrenForDownload();
   }
 
   List<TestCaseRowData> _getExpandedChildList({
@@ -173,8 +174,8 @@ class TestCaseDataController with ChangeNotifier {
 
   void _removeAfterParentData(int parentUIIndex, String grandParentIndex) {
     if (parentUIIndex + 1 >= rowList.length) return;
-    int? removeStart=null;
-    int? removeEnd=null;
+    int? removeStart;
+    int? removeEnd;
     for (int i = parentUIIndex + 1; i < rowList.length; i++) {
       if (rowList[i].parentData == null) {
         break;
@@ -182,49 +183,49 @@ class TestCaseDataController with ChangeNotifier {
       if (rowList[i].parentData?.actualParentLocation.toString() ==
           grandParentIndex) {
         removeStart ??= i;
-        removeEnd=i;
+        removeEnd = i;
       } else {
         break;
       }
     }
-    if(removeStart!=null && removeEnd!=null){
-      rowList.removeRange(removeStart, removeEnd+1);
+    if (removeStart != null && removeEnd != null) {
+      rowList.removeRange(removeStart, removeEnd + 1);
     }
   }
 
   void _removeBeforeParentData(int parentUIIndex, String grandParentIndex) {
-    if (parentUIIndex - 1 <=0) return;
-    int? removeStart=null;
-    int? removeEnd=null;
+    if (parentUIIndex - 1 <= 0) return;
+    int? removeStart,removeEnd;
     for (int i = parentUIIndex - 1; i >= 0; i--) {
       if (rowList[i].parentData == null) {
         break;
       }
       if (rowList[i].parentData?.actualParentLocation.toString() ==
           grandParentIndex) {
-        removeStart= i;
-        removeEnd??=i;
+        removeStart = i;
+        removeEnd ??= i;
       } else {
         break;
       }
     }
-    if(removeStart!=null && removeEnd!=null){
-      rowList.removeRange(removeStart, removeEnd+1);
+    if (removeStart != null && removeEnd != null) {
+      rowList.removeRange(removeStart, removeEnd + 1);
     }
   }
 
   void _updateUIListWithNewExpandedChildList({
     required TestCaseRowData parentTestCase,
     required List<TestCaseRowData> expandedData,
+    bool preserveSelf=true,
   }) {
-    final tempList=[...rowList];
     int parentIndex = _getParentIndex(parentTestCase.actualPosition);
     bool isNotFirst = parentIndex != 0;
-    bool isNotLast = parentIndex != tempList.length - 1;
+    bool isNotLast = parentIndex != rowList.length - 1;
     rowList = [
-      if (isNotFirst) ...tempList.sublist(0, parentIndex),
+      if (isNotFirst) ...rowList.sublist(0, parentIndex),
+      if(preserveSelf)parentTestCase,
       ...expandedData,
-      if (isNotLast) ...tempList.sublist(parentIndex + 1, tempList.length),
+      if (isNotLast) ...rowList.sublist(parentIndex + 1, rowList.length),
     ];
   }
 
@@ -233,22 +234,12 @@ class TestCaseDataController with ChangeNotifier {
         element.actualPosition.toString() == actualParentLocation.toString());
   }
 
-  void _insertFirstDepthOfDataToRowList() {
-    for (int i = 0; i <= _originalTestCase.length; i++) {
-      rowList.add(
-        TestCaseRowData(
-          parentData: null,
-          isGroup: _originalTestCase[i].children != null,
-          testCase: _originalTestCase[i],
-          actualPosition: [i],
-        ),
-      );
-    }
-  }
-
   void _renderAllDeepChildrenForDownload() {
     int depth = 0;
+    //Can infinitely loop if some logic are changed
     while (true) {
+      // ignore: avoid_print
+      print("Expanding Deep Children");
       bool foundSomethingToExpand = _findAndExpand(rowList, depth);
       if (!foundSomethingToExpand) {
         break;
@@ -261,22 +252,12 @@ class TestCaseDataController with ChangeNotifier {
     final listToBeCheckedAndExpanded = [...parentTestCaseList];
     bool foundSomethingToExpand = false;
     for (var element in listToBeCheckedAndExpanded) {
-      if (_findWhetherItCanExpand(depth, element)) {
-        foundSomethingToExpand = true;
-        expandChildren(parentTestCase: element, removeSiblings: false);
-      }
+      if (element.actualPosition.length <= depth) continue;
+      if (element.testCase.children == null) continue;
+      if (element.testCase.children!.isEmpty) continue;
+      foundSomethingToExpand = true;
+      expandChildren(parentTestCase: element, removeSiblingsAndRemoveParent: false);
     }
     return foundSomethingToExpand;
-  }
-
-  bool _findWhetherItCanExpand(int depth, TestCaseRowData element) {
-    if (depth == 0 && element.testCase.children != null) return true;
-    assert(element.parentData != null,
-        "Parent Data null means there is some error while inserting the data");
-    if (element.parentData == null) return false;
-    if (depth > 0 && element.parentData!.actualParentLocation.length == 1) {
-      return true;
-    }
-    return false;
   }
 }
