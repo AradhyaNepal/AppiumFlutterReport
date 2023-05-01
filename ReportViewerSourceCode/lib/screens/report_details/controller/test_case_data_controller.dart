@@ -1,19 +1,21 @@
 import 'package:appium_report/model/test_case.dart';
 import 'package:appium_report/screens/report_details/model/test_case_row_data.dart';
+import 'package:flutter/material.dart';
 
-class TestCaseDataController {
-  List<TestCaseRowData> _rowList = [];
+class TestCaseDataController with ChangeNotifier {
+  List<TestCaseRowData> rowList = [];
 
-  List<TestCaseRowData> get rowList =>
-      List.unmodifiable(_rowList); //Todo: may cause bug. Do Testing
   final List<TestCase> _originalTestCase;
 
-  TestCaseDataController(this._originalTestCase);
+
+  TestCaseDataController(this._originalTestCase) {
+    optimizedTableRender();
+  }
 
   void optimizedTableRender() {
-    _rowList.clear();
+    rowList.clear();
     for (int i = 0; i < _originalTestCase.length; i++) {
-      _rowList.add(
+      rowList.add(
         TestCaseRowData(
           actualPosition: [i],
           parentData: null,
@@ -25,7 +27,7 @@ class TestCaseDataController {
   }
 
   void forDownloadTableRender() {
-    _rowList.clear();
+    rowList.clear();
     _insertFirstDepthOfDataToRowList();
     _renderAllDeepChildrenForDownload();
   }
@@ -42,15 +44,19 @@ class TestCaseDataController {
       parentActualData: parentTestCase.testCase,
     );
 
+
     if (removeSiblings) {
       _removeSiblingsOfExpandedParentExceptRoot(
         actualParentLocation: parentTestCase.actualPosition,
       );
-    }
+
     _updateUIListWithNewExpandedChildList(
       parentTestCase: parentTestCase,
       expandedData: expandedData,
     );
+
+    }
+    notifyListeners();
   }
 
   ///Every children have its parentsActualLocation,
@@ -74,16 +80,16 @@ class TestCaseDataController {
     final newParentLocation =
         nearestParent.actualPosition.sublist(0, whichParentLocationIndex + 1);
     bool weFoundTheStaringOfRemoval = false;
-    for (int i = 0; i < _rowList.length; i++) {
-      if (_rowList[i].parentData == null) continue;
-      bool elementHaveGeneOfNewParent = _rowList[i]
+    for (int i = 0; i < rowList.length; i++) {
+      if (rowList[i].parentData == null) continue;
+      bool elementHaveGeneOfNewParent = rowList[i]
               .parentData!
               .actualParentLocation
               .sublist(0, newParentLocation.length)
               .toString() ==
           newParentLocation.toString();
       if (elementHaveGeneOfNewParent) {
-        _rowList.removeAt(i);
+        rowList.removeAt(i);
         weFoundTheStaringOfRemoval = true;
       } else if (weFoundTheStaringOfRemoval) {
         //  The items are stored in a sequence so,
@@ -94,7 +100,7 @@ class TestCaseDataController {
     }
     //Expand Children also restore newParentLocation's Siblings which were deleted previously.
     expandChildren(
-        parentTestCase: _rowList.firstWhere((element) =>
+        parentTestCase: rowList.firstWhere((element) =>
             element.actualPosition.toString() == newParentLocation.toString()));
   }
 
@@ -166,27 +172,33 @@ class TestCaseDataController {
   }
 
   void _removeAfterParentData(int parentUIIndex, String grandParentIndex) {
-    if (parentUIIndex + 1 > _rowList.length - 1) return;
-    for (int i = parentUIIndex + 1; i < _rowList.length; i++) {
-      if (_rowList[i].parentData == null) {
+    if (parentUIIndex + 1 >= rowList.length) return;
+    int? removeStart=null;
+    int? removeEnd=null;
+    for (int i = parentUIIndex + 1; i < rowList.length; i++) {
+      if (rowList[i].parentData == null) {
         break;
       }
-      if (_rowList[i].parentData?.actualParentLocation.toString() ==
+      if (rowList[i].parentData?.actualParentLocation.toString() ==
           grandParentIndex) {
-        _rowList.removeAt(i);
+        removeStart ??= i;
+        removeEnd=i;
       } else {
         break;
       }
+    }
+    if(removeStart!=null && removeEnd!=null){
+      rowList.removeRange(removeStart, removeEnd+1);
     }
   }
 
   void _removeBeforeParentData(int parentUIIndex, String grandParentIndex) {
     int tillWhereGrandParentFound = parentUIIndex;
     for (int i = parentUIIndex - 1; i >= 0; i--) {
-      if (_rowList[i].parentData == null) {
+      if (rowList[i].parentData == null) {
         break;
       }
-      if (_rowList[i].parentData?.actualParentLocation.toString() ==
+      if (rowList[i].parentData?.actualParentLocation.toString() ==
           grandParentIndex) {
         tillWhereGrandParentFound--;
       } else {
@@ -195,11 +207,11 @@ class TestCaseDataController {
     }
 
     if (tillWhereGrandParentFound < parentUIIndex) {
-      _rowList = [
+      rowList = [
         if (tillWhereGrandParentFound != 0)
-          ..._rowList.sublist(0, tillWhereGrandParentFound),
-        if (parentUIIndex != _rowList.length - 1)
-          ..._rowList.sublist(parentUIIndex, _rowList.length),
+          ...rowList.sublist(0, tillWhereGrandParentFound),
+        if (parentUIIndex != rowList.length - 1)
+          ...rowList.sublist(parentUIIndex, rowList.length),
       ];
     }
   }
@@ -208,24 +220,25 @@ class TestCaseDataController {
     required TestCaseRowData parentTestCase,
     required List<TestCaseRowData> expandedData,
   }) {
+    final tempList=[...rowList];
     int parentIndex = _getParentIndex(parentTestCase.actualPosition);
     bool isNotFirst = parentIndex != 0;
-    bool isNotLast = parentIndex != _rowList.length - 1;
-    _rowList = [
-      if (isNotFirst) ..._rowList.sublist(0, parentIndex),
+    bool isNotLast = parentIndex != tempList.length - 1;
+    rowList = [
+      if (isNotFirst) ...tempList.sublist(0, parentIndex),
       ...expandedData,
-      if (isNotLast) ..._rowList.sublist(parentIndex + 1, _rowList.length),
+      if (isNotLast) ...tempList.sublist(parentIndex + 1, tempList.length),
     ];
   }
 
   int _getParentIndex(List<int> actualParentLocation) {
-    return _rowList.indexWhere((element) =>
+    return rowList.indexWhere((element) =>
         element.actualPosition.toString() == actualParentLocation.toString());
   }
 
   void _insertFirstDepthOfDataToRowList() {
     for (int i = 0; i <= _originalTestCase.length; i++) {
-      _rowList.add(
+      rowList.add(
         TestCaseRowData(
           parentData: null,
           isGroup: _originalTestCase[i].children != null,
@@ -239,7 +252,7 @@ class TestCaseDataController {
   void _renderAllDeepChildrenForDownload() {
     int depth = 0;
     while (true) {
-      bool foundSomethingToExpand = _findAndExpand(_rowList, depth);
+      bool foundSomethingToExpand = _findAndExpand(rowList, depth);
       if (!foundSomethingToExpand) {
         break;
       }
@@ -264,8 +277,9 @@ class TestCaseDataController {
     assert(element.parentData != null,
         "Parent Data null means there is some error while inserting the data");
     if (element.parentData == null) return false;
-    if (depth > 0 && element.parentData!.actualParentLocation.length == 1)
+    if (depth > 0 && element.parentData!.actualParentLocation.length == 1) {
       return true;
+    }
     return false;
   }
 }
