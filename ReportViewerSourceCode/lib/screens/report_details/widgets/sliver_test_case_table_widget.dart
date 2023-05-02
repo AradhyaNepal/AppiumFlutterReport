@@ -3,6 +3,7 @@ import 'package:appium_report/screens/report_details/model/test_case_row_data.da
 import 'package:appium_report/screens/report_details/widgets/row_structure_widget.dart';
 import 'package:appium_report/screens/report_details/widgets/vertical_horizontal_divider_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../controller/test_case_data_controller.dart';
 import 'first_sub_child_navigation_widget.dart';
@@ -46,7 +47,9 @@ class TestCaseRowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final subGroupIndex=data.parentData==null?0:data.parentData!.actualParent.actualPosition.length;
+    final subGroupIndex = data.parentData == null
+        ? 0
+        : data.parentData!.actualParent.actualPosition.length;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -82,8 +85,6 @@ class TestCaseRowWidget extends StatelessWidget {
   }
 }
 
-
-
 class StepsWidget extends StatelessWidget {
   const StepsWidget({
     super.key,
@@ -99,18 +100,32 @@ class StepsWidget extends StatelessWidget {
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: data.testCase.steps
-          .map(
-            (e) => Text(
-          e.isEmpty ? "--" : e,
-        ),
-      )
-          .toList(),
+      children: data.testCase.steps.map(
+        (e) {
+          return Padding(
+            padding: EdgeInsets.only(
+              bottom: 5.h,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.arrow_right,
+                ),
+                SizedBox(width: 2.w,),
+                Expanded(
+                  child: Text(
+                    e.isEmpty ? "--" : e,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ).toList(),
     );
   }
 }
-
-
 
 class TestCaseActionWidget extends StatelessWidget {
   const TestCaseActionWidget({
@@ -152,22 +167,23 @@ class TestCaseActionWidget extends StatelessWidget {
 
 class GroupOrRootTestCaseBottomDividerWidget extends StatelessWidget {
   final TestCaseRow data;
-  const GroupOrRootTestCaseBottomDividerWidget({
-    required this.data,
-    Key? key}) : super(key: key);
+
+  const GroupOrRootTestCaseBottomDividerWidget({required this.data, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final parentData=data.parentData;
-    if(parentData==null){
+    final parentData = data.parentData;
+    if (parentData == null) {
       return const HorizontalDividerWidget();
     }
-    int subGroupIndex=parentData.actualParent.actualPosition.length;
-    if(parentData.childType!=ChildType.last){
-      return HorizontalDividerWidget(colorAsSubGroup: subGroupIndex,);
-    }else{
-      return
-        HorizontalDividerWidget(
+    int subGroupIndex = parentData.actualParent.actualPosition.length;
+    if (parentData.childType != ChildType.last) {
+      return HorizontalDividerWidget(
+        colorAsSubGroup: subGroupIndex,
+      );
+    } else {
+      return HorizontalDividerWidget(
         subGroupIndex: subGroupIndex,
         subGroupBorderInTop: true,
       );

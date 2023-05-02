@@ -44,12 +44,12 @@ class FirstChildrenNavigatingBackToParentWidget extends StatelessWidget {
                       GestureDetector(
                         onTap: () {
                           Provider.of<TestCaseDataController>(context,
-                              listen: false)
+                                  listen: false)
                               .goBack(
                             nearestParentPosition:
-                            parent.actualParent.actualPosition,
+                                parent.actualParent.actualPosition,
                             targetedParentDepth:
-                            parent.actualParent.actualPosition.length - 1,
+                                parent.actualParent.actualPosition.length - 1,
                           );
                         },
                         child: const Icon(
@@ -57,17 +57,15 @@ class FirstChildrenNavigatingBackToParentWidget extends StatelessWidget {
                         ),
                       ),
                       for (int depth = 1;
-                      depth <=
-                          data.parentData!.actualParent.actualPosition
-                              .length;
-                      depth++) ...[
+                          depth <= parent.parents.length;
+                          depth++) ...[
                         TextButton(
                           onPressed: () {
                             Provider.of<TestCaseDataController>(context,
-                                listen: false)
+                                    listen: false)
                                 .goBack(
                               nearestParentPosition:
-                              parent.actualParent.actualPosition,
+                                  parent.actualParent.actualPosition,
                               targetedParentDepth: depth,
                             );
                           },
@@ -75,9 +73,19 @@ class FirstChildrenNavigatingBackToParentWidget extends StatelessWidget {
                             parent.parents[depth - 1],
                           ),
                         ),
-                        const Icon(
-                          Icons.arrow_forward_ios_rounded,
-                        )
+                        if (depth == parent.parents.length)
+                          GestureDetector(
+                            onTap: (){
+
+                            },
+                            child: const Icon(
+                              Icons.visibility,
+                            ),
+                          )
+                        else
+                          const Icon(
+                            Icons.arrow_forward_ios_rounded,
+                          )
                       ],
                     ],
                   ),
