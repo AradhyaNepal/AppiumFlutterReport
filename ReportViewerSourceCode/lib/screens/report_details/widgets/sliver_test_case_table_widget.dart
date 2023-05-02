@@ -22,7 +22,7 @@ class SliverTestCaseTableWidget extends StatelessWidget {
     final list = Provider.of<TestCaseDataController>(context).rowList;
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-        (context, index) {
+            (context, index) {
           return TestCaseRowWidget(
             data: list[index],
             rootChildType: TestCaseDataController.getChildType(

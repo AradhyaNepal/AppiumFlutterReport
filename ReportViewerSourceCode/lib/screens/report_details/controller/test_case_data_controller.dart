@@ -6,10 +6,21 @@ class TestCaseDataController with ChangeNotifier {
   List<TestCaseRow> rowList = [];
 
   final List<TestCase> _originalTestCase;
-
-  TestCaseDataController(this._originalTestCase) {
+  TestCaseDataController(this._originalTestCase){
     _renderFirstRoot();
   }
+
+  void renderOptimizedTable(){
+    _renderFirstRoot();
+    notifyListeners();
+  }
+
+  void renderForDownloadTable() {
+    rowList.clear();
+    _renderFirstRoot();
+    _renderAllDeepChildrenForDownload();
+  }
+
 
   void expandChildren({
     required TestCaseRow parentTestCase,
@@ -159,7 +170,6 @@ class TestCaseDataController with ChangeNotifier {
   }
 
 
-
   void _renderFirstRoot() {
     rowList.clear();
     for (int i = 0; i < _originalTestCase.length; i++) {
@@ -174,12 +184,6 @@ class TestCaseDataController with ChangeNotifier {
     }
   }
 
-  // ignore: unused_element
-  void _forDownloadTableRender() {
-    rowList.clear();
-    _renderFirstRoot();
-    _renderAllDeepChildrenForDownload();
-  }
 
   List<TestCaseRow> _getExpandedChildList({
     required TestCaseRow parentRowData,
