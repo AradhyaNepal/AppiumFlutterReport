@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+import '../../../common/utils/is_big.dart';
 import '../controller/test_case_data_controller.dart';
 
 class SliverTestCaseTableWidget extends StatelessWidget {
@@ -110,30 +111,60 @@ class RowStructureWidget extends StatelessWidget {
         children: [
           Expanded(
             flex: 1,
-            child: testActionWidget,
+            child: CellWrapperWidget(
+              child: testActionWidget,
+            ),
           ),
           const VerticalDividerWidget(),
           Expanded(
             flex: 2,
-            child: nameWidget,
+            child: CellWrapperWidget(
+              child: nameWidget,
+            ),
           ),
           const VerticalDividerWidget(),
           Expanded(
             flex: 1,
-            child: durationWidget,
+            child: CellWrapperWidget(
+              child: durationWidget,
+            ),
           ),
           const VerticalDividerWidget(),
           Expanded(
             flex: 1,
-            child: statusWidget,
+            child: CellWrapperWidget(
+              child: statusWidget,
+            ),
           ),
           const VerticalDividerWidget(),
           Expanded(
             flex: 2,
-            child: stepsWidget,
+            child: CellWrapperWidget(
+              child: stepsWidget,
+            ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class CellWrapperWidget extends StatelessWidget {
+  const CellWrapperWidget({
+    super.key,
+    required this.child,
+  });
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        vertical: 7.5.h,
+        horizontal: 4.w,
+      ),
+      child: child,
     );
   }
 }
@@ -151,10 +182,10 @@ class VerticalDividerWidget extends StatelessWidget {
   }
 }
 
-
 class FirstRootElementHeadingWidget extends StatelessWidget {
   final TestCaseRow data;
   final ChildType rootParentType;
+
   const FirstRootElementHeadingWidget({
     required this.data,
     required this.rootParentType,
@@ -163,22 +194,39 @@ class FirstRootElementHeadingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if(rootParentType!=ChildType.first)return const SizedBox();
-    return const RowStructureWidget(
-      testActionWidget: Text(
-        "Action"
-      ),
-      nameWidget: Text(
-          "Test or Group Name"
-      ),
-      durationWidget: Text(
-        "Duration",
-      ),
-      statusWidget: Text(
-        "Status"
-      ),
-      stepsWidget: Text(
-        "Steps"
+    if (rootParentType != ChildType.first) return const SizedBox();
+    const style = TextStyle(
+      fontWeight: FontWeight.w700,
+      color: Colors.white,
+    );
+    return Container(
+      decoration: BoxDecoration(
+          color: Theme.of(context).primaryColor.withOpacity(0.8),
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(5.r),
+            topLeft: Radius.circular(5.r),
+          )),
+      child: const RowStructureWidget(
+        testActionWidget: Text(
+          "Action",
+          style: style,
+        ),
+        nameWidget: Text(
+          "Test or Group Name",
+          style: style,
+        ),
+        durationWidget: Text(
+          "Duration",
+          style: style,
+        ),
+        statusWidget: Text(
+          "Status",
+          style: style,
+        ),
+        stepsWidget: Text(
+          "Steps",
+          style: style,
+        ),
       ),
     );
   }
@@ -199,15 +247,15 @@ class FirstChildrenNavigatingBackToParentWidget extends StatelessWidget {
     if (parent.childType != ChildType.first) return const SizedBox();
     return Row(
       children: [
-        IconButton(
-          onPressed: () {
+        GestureDetector(
+          onTap: () {
             Provider.of<TestCaseDataController>(context, listen: false).goBack(
               nearestParentPosition: parent.actualParent.actualPosition,
               targetedParentDepth:
                   parent.actualParent.actualPosition.length - 1,
             );
           },
-          icon: const Icon(
+          child: const Icon(
             Icons.arrow_back_outlined,
           ),
         ),
@@ -246,8 +294,8 @@ class TestCaseActionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (data.isGroup) {
-      return IconButton(
-        onPressed: () {
+      return GestureDetector(
+        onTap: () {
           if (data.testCase.children == null) return;
           if (data.testCase.children!.isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -256,16 +304,16 @@ class TestCaseActionWidget extends StatelessWidget {
           Provider.of<TestCaseDataController>(context, listen: false)
               .expandChildren(parentTestCase: data);
         },
-        icon: const Icon(
+        child: const Icon(
           Icons.arrow_drop_down,
         ),
       );
     } else {
-      return IconButton(
-        onPressed: () {
+      return GestureDetector(
+        onTap: () {
           //Todo: Open Testcase details screen
         },
-        icon: const Icon(
+        child: const Icon(
           Icons.visibility,
         ),
       );
