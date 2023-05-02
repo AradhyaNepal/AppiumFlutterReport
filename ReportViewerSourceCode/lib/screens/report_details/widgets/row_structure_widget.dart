@@ -30,7 +30,6 @@ class RowStructureWidget extends StatelessWidget {
           VerticalDividerWidget(
             justPlaceHolder: isHeader,
             subGroupIndex: subGroupIndex,
-            subGroupBorderInLeft: false,
           ),
           Expanded(
             flex: 1,
@@ -39,7 +38,7 @@ class RowStructureWidget extends StatelessWidget {
             ),
           ),
           VerticalDividerWidget(
-            colorAsSubChild: subGroupIndex,
+            subGroupIndex: subGroupIndex,
           ),
           Expanded(
             flex: 2,
@@ -48,7 +47,7 @@ class RowStructureWidget extends StatelessWidget {
             ),
           ),
           VerticalDividerWidget(
-            colorAsSubChild: subGroupIndex,
+            subGroupIndex: subGroupIndex,
           ),
           Expanded(
             flex: 1,
@@ -57,7 +56,7 @@ class RowStructureWidget extends StatelessWidget {
             ),
           ),
           VerticalDividerWidget(
-            colorAsSubChild: subGroupIndex,
+            subGroupIndex: subGroupIndex,
           ),
           Expanded(
             flex: 1,
@@ -66,7 +65,7 @@ class RowStructureWidget extends StatelessWidget {
             ),
           ),
           VerticalDividerWidget(
-            colorAsSubChild: subGroupIndex,
+            subGroupIndex: subGroupIndex,
           ),
           Expanded(
             flex: 2,
@@ -77,7 +76,6 @@ class RowStructureWidget extends StatelessWidget {
           VerticalDividerWidget(
             justPlaceHolder: isHeader,
             subGroupIndex: subGroupIndex,
-            subGroupBorderInLeft: true,
           ),
         ],
       ),

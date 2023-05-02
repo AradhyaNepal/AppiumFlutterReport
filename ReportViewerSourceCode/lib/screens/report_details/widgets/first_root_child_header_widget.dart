@@ -1,6 +1,5 @@
 
 import 'package:appium_report/screens/report_details/widgets/row_structure_widget.dart';
-import 'package:appium_report/screens/report_details/widgets/sliver_test_case_table_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 

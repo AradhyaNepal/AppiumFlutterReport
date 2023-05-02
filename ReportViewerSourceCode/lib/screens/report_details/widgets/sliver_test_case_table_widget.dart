@@ -166,7 +166,8 @@ class GroupOrRootTestCaseBottomDividerWidget extends StatelessWidget {
     if(parentData.childType!=ChildType.last){
       return HorizontalDividerWidget(colorAsSubGroup: subGroupIndex,);
     }else{
-      return HorizontalDividerWidget(
+      return
+        HorizontalDividerWidget(
         subGroupIndex: subGroupIndex,
         subGroupBorderInTop: true,
       );

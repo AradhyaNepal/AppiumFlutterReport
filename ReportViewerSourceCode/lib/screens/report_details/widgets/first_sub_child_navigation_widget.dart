@@ -32,7 +32,6 @@ class FirstChildrenNavigatingBackToParentWidget extends StatelessWidget {
             children: [
               VerticalDividerWidget(
                 subGroupIndex: subGroupIndex,
-                subGroupBorderInLeft: false,
               ),
               Expanded(
                 child: Padding(
@@ -86,7 +85,6 @@ class FirstChildrenNavigatingBackToParentWidget extends StatelessWidget {
               ),
               VerticalDividerWidget(
                 subGroupIndex: subGroupIndex,
-                subGroupBorderInLeft: true,
               ),
             ],
           ),

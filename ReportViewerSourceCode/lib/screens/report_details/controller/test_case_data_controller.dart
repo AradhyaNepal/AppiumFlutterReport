@@ -1,7 +1,6 @@
 import 'package:appium_report/model/test_case.dart';
 import 'package:appium_report/screens/report_details/model/test_case_row_data.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 class TestCaseDataController with ChangeNotifier {
   List<TestCaseRow> rowList = [];
@@ -175,6 +174,7 @@ class TestCaseDataController with ChangeNotifier {
     }
   }
 
+  // ignore: unused_element
   void _forDownloadTableRender() {
     rowList.clear();
     _renderFirstRoot();
