@@ -1,9 +1,12 @@
 import 'package:appium_report/model/report.dart';
 import 'package:appium_report/screens/report_details/model/test_case_row_data.dart';
+import 'package:appium_report/screens/report_details/widgets/row_structure_widget.dart';
+import 'package:appium_report/screens/report_details/widgets/vertical_horizontal_divider_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../controller/test_case_data_controller.dart';
+import 'first_sub_child_navigation_widget.dart';
+import 'first_root_child_header_widget.dart';
 
 class SliverTestCaseTableWidget extends StatelessWidget {
   final Report report;
@@ -43,6 +46,7 @@ class TestCaseRowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final subGroupIndex=data.parentData==null?0:data.parentData!.actualParent.actualPosition.length;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -60,20 +64,7 @@ class TestCaseRowWidget extends StatelessWidget {
           nameWidget: Text(
             data.testCase.testName,
           ),
-          stepsWidget: Builder(builder: (context) {
-            if (data.testCase.steps.isEmpty) {
-              return const Text("--");
-            }
-            return Column(
-              children: data.testCase.steps
-                  .map(
-                    (e) => Text(
-                      e.isEmpty ? "--" : e,
-                    ),
-                  )
-                  .toList(),
-            );
-          }),
+          stepsWidget: StepsWidget(data: data),
           durationWidget: Text(
             data.testCase.duration,
           ),
@@ -81,259 +72,45 @@ class TestCaseRowWidget extends StatelessWidget {
             data.testCase.status,
           ),
           isHeader: false,
+          subGroupIndex: subGroupIndex,
         ),
-        const HorizontalDividerWidget(),
+        GroupOrRootTestCaseBottomDividerWidget(
+          data: data,
+        ),
       ],
     );
   }
 }
 
-class HorizontalDividerWidget extends StatelessWidget {
-  const HorizontalDividerWidget({
+
+
+class StepsWidget extends StatelessWidget {
+  const StepsWidget({
     super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: 1.w,
-      color: Theme.of(context).primaryColor,
-    );
-  }
-}
-
-class RowStructureWidget extends StatelessWidget {
-  final Widget testActionWidget;
-  final Widget nameWidget;
-  final Widget durationWidget;
-  final Widget statusWidget;
-  final Widget stepsWidget;
-  final bool isHeader;
-
-  const RowStructureWidget({
-    required this.testActionWidget,
-    required this.nameWidget,
-    required this.durationWidget,
-    required this.statusWidget,
-    required this.stepsWidget,
-    required this.isHeader,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return IntrinsicHeight(
-      child: Row(
-        children: [
-          VerticalDividerWidget(
-            justPlaceHolder: isHeader,
-          ),
-          Expanded(
-            flex: 1,
-            child: CellWrapperWidget(
-              child: testActionWidget,
-            ),
-          ),
-          const VerticalDividerWidget(),
-          Expanded(
-            flex: 2,
-            child: CellWrapperWidget(
-              child: nameWidget,
-            ),
-          ),
-          const VerticalDividerWidget(),
-          Expanded(
-            flex: 1,
-            child: CellWrapperWidget(
-              child: durationWidget,
-            ),
-          ),
-          const VerticalDividerWidget(),
-          Expanded(
-            flex: 1,
-            child: CellWrapperWidget(
-              child: statusWidget,
-            ),
-          ),
-          const VerticalDividerWidget(),
-          Expanded(
-            flex: 2,
-            child: CellWrapperWidget(
-              child: stepsWidget,
-            ),
-          ),
-          VerticalDividerWidget(
-            justPlaceHolder: isHeader,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class CellWrapperWidget extends StatelessWidget {
-  const CellWrapperWidget({
-    super.key,
-    required this.child,
-  });
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        vertical: 7.5.h,
-        horizontal: 4.w,
-      ),
-      child: child,
-    );
-  }
-}
-
-class VerticalDividerWidget extends StatelessWidget {
-  final bool justPlaceHolder;
-
-  const VerticalDividerWidget({
-    this.justPlaceHolder = false,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 1.w,
-      height: justPlaceHolder ? null : double.infinity,
-      color: justPlaceHolder ? null : Theme.of(context).primaryColor,
-    );
-  }
-}
-
-class FirstRootElementHeadingWidget extends StatelessWidget {
-  final TestCaseRow data;
-  final ChildType rootParentType;
-
-  const FirstRootElementHeadingWidget({
     required this.data,
-    required this.rootParentType,
-    super.key,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    if (rootParentType != ChildType.first) return const SizedBox();
-    const style = TextStyle(
-      fontWeight: FontWeight.w700,
-      color: Colors.white,
-    );
-    return Container(
-      decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor.withOpacity(0.8),
-          borderRadius: BorderRadius.only(
-            topRight: Radius.circular(5.r),
-            topLeft: Radius.circular(5.r),
-          )),
-      child:const RowStructureWidget(
-        testActionWidget: Text(
-          "Action",
-          style: style,
-        ),
-        nameWidget: Text(
-          "Test or Group Name",
-          style: style,
-        ),
-        durationWidget: Text(
-          "Duration",
-          style: style,
-        ),
-        statusWidget: Text(
-          "Status",
-          style: style,
-        ),
-        stepsWidget: Text(
-          "Steps",
-          style: style,
-        ),
-        isHeader: true,
-      ),
-    );
-  }
-}
-
-class FirstChildrenNavigatingBackToParentWidget extends StatelessWidget {
   final TestCaseRow data;
 
-  const FirstChildrenNavigatingBackToParentWidget({
-    required this.data,
-    super.key,
-  });
-
   @override
   Widget build(BuildContext context) {
-    final parent = data.parentData;
-    if (parent == null) return const SizedBox();
-    if (parent.childType != ChildType.first) return const SizedBox();
+    if (data.testCase.steps.isEmpty) {
+      return const Text("--");
+    }
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        IntrinsicHeight(
-          child: Row(
-            children: [
-              const VerticalDividerWidget(),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 10.h,
-                    horizontal: 2.w,
-                  ),
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Provider.of<TestCaseDataController>(context, listen: false)
-                              .goBack(
-                            nearestParentPosition: parent.actualParent.actualPosition,
-                            targetedParentDepth:
-                                parent.actualParent.actualPosition.length - 1,
-                          );
-                        },
-                        child: const Icon(
-                          Icons.arrow_back_outlined,
-                        ),
-                      ),
-                      for (int depth = 1;
-                          depth <= data.parentData!.actualParent.actualPosition.length;
-                          depth++) ...[
-                        TextButton(
-                          onPressed: () {
-                            Provider.of<TestCaseDataController>(context, listen: false)
-                                .goBack(
-                              nearestParentPosition: parent.actualParent.actualPosition,
-                              targetedParentDepth: depth,
-                            );
-                          },
-                          child: Text(
-                            parent.parents[depth - 1],
-                          ),
-                        ),
-                        const Icon(
-                          Icons.arrow_forward_ios_rounded,
-                        )
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-              const VerticalDividerWidget(),
-            ],
-          ),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: data.testCase.steps
+          .map(
+            (e) => Text(
+          e.isEmpty ? "--" : e,
         ),
-        const HorizontalDividerWidget(),
-      ],
+      )
+          .toList(),
     );
   }
 }
+
+
 
 class TestCaseActionWidget extends StatelessWidget {
   const TestCaseActionWidget({
@@ -368,6 +145,30 @@ class TestCaseActionWidget extends StatelessWidget {
         child: const Icon(
           Icons.visibility,
         ),
+      );
+    }
+  }
+}
+
+class GroupOrRootTestCaseBottomDividerWidget extends StatelessWidget {
+  final TestCaseRow data;
+  const GroupOrRootTestCaseBottomDividerWidget({
+    required this.data,
+    Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final parentData=data.parentData;
+    if(parentData==null){
+      return const HorizontalDividerWidget();
+    }
+    int subGroupIndex=parentData.actualParent.actualPosition.length;
+    if(parentData.childType!=ChildType.last){
+      return HorizontalDividerWidget(colorAsSubGroup: subGroupIndex,);
+    }else{
+      return HorizontalDividerWidget(
+        subGroupIndex: subGroupIndex,
+        subGroupBorderInTop: true,
       );
     }
   }
