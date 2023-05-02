@@ -74,6 +74,11 @@ class _ReportDetailsContent extends StatelessWidget {
             SliverTestCaseTableWidget(
               report: report,
             ),
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 50.h,
+              ),
+            ),
           ],
         ),
       ),

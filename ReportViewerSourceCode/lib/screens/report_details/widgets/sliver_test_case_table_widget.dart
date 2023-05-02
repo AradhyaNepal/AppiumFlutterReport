@@ -3,8 +3,6 @@ import 'package:appium_report/screens/report_details/model/test_case_row_data.da
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-
-import '../../../common/utils/is_big.dart';
 import '../controller/test_case_data_controller.dart';
 
 class SliverTestCaseTableWidget extends StatelessWidget {
@@ -82,8 +80,25 @@ class TestCaseRowWidget extends StatelessWidget {
           statusWidget: Report.getStatusIcon(
             data.testCase.status,
           ),
+          isHeader: false,
         ),
+        const HorizontalDividerWidget(),
       ],
+    );
+  }
+}
+
+class HorizontalDividerWidget extends StatelessWidget {
+  const HorizontalDividerWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: 1.w,
+      color: Theme.of(context).primaryColor,
     );
   }
 }
@@ -94,6 +109,7 @@ class RowStructureWidget extends StatelessWidget {
   final Widget durationWidget;
   final Widget statusWidget;
   final Widget stepsWidget;
+  final bool isHeader;
 
   const RowStructureWidget({
     required this.testActionWidget,
@@ -101,6 +117,7 @@ class RowStructureWidget extends StatelessWidget {
     required this.durationWidget,
     required this.statusWidget,
     required this.stepsWidget,
+    required this.isHeader,
     Key? key,
   }) : super(key: key);
 
@@ -109,6 +126,9 @@ class RowStructureWidget extends StatelessWidget {
     return IntrinsicHeight(
       child: Row(
         children: [
+          VerticalDividerWidget(
+            justPlaceHolder: isHeader,
+          ),
           Expanded(
             flex: 1,
             child: CellWrapperWidget(
@@ -143,6 +163,9 @@ class RowStructureWidget extends StatelessWidget {
               child: stepsWidget,
             ),
           ),
+          VerticalDividerWidget(
+            justPlaceHolder: isHeader,
+          ),
         ],
       ),
     );
@@ -170,14 +193,19 @@ class CellWrapperWidget extends StatelessWidget {
 }
 
 class VerticalDividerWidget extends StatelessWidget {
-  const VerticalDividerWidget({Key? key}) : super(key: key);
+  final bool justPlaceHolder;
+
+  const VerticalDividerWidget({
+    this.justPlaceHolder = false,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 1.w,
-      height: double.infinity,
-      color: Theme.of(context).primaryColor,
+      height: justPlaceHolder ? null : double.infinity,
+      color: justPlaceHolder ? null : Theme.of(context).primaryColor,
     );
   }
 }
@@ -206,7 +234,7 @@ class FirstRootElementHeadingWidget extends StatelessWidget {
             topRight: Radius.circular(5.r),
             topLeft: Radius.circular(5.r),
           )),
-      child: const RowStructureWidget(
+      child:const RowStructureWidget(
         testActionWidget: Text(
           "Action",
           style: style,
@@ -227,6 +255,7 @@ class FirstRootElementHeadingWidget extends StatelessWidget {
           "Steps",
           style: style,
         ),
+        isHeader: true,
       ),
     );
   }
@@ -245,39 +274,62 @@ class FirstChildrenNavigatingBackToParentWidget extends StatelessWidget {
     final parent = data.parentData;
     if (parent == null) return const SizedBox();
     if (parent.childType != ChildType.first) return const SizedBox();
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        GestureDetector(
-          onTap: () {
-            Provider.of<TestCaseDataController>(context, listen: false).goBack(
-              nearestParentPosition: parent.actualParent.actualPosition,
-              targetedParentDepth:
-                  parent.actualParent.actualPosition.length - 1,
-            );
-          },
-          child: const Icon(
-            Icons.arrow_back_outlined,
+        IntrinsicHeight(
+          child: Row(
+            children: [
+              const VerticalDividerWidget(),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 10.h,
+                    horizontal: 2.w,
+                  ),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Provider.of<TestCaseDataController>(context, listen: false)
+                              .goBack(
+                            nearestParentPosition: parent.actualParent.actualPosition,
+                            targetedParentDepth:
+                                parent.actualParent.actualPosition.length - 1,
+                          );
+                        },
+                        child: const Icon(
+                          Icons.arrow_back_outlined,
+                        ),
+                      ),
+                      for (int depth = 1;
+                          depth <= data.parentData!.actualParent.actualPosition.length;
+                          depth++) ...[
+                        TextButton(
+                          onPressed: () {
+                            Provider.of<TestCaseDataController>(context, listen: false)
+                                .goBack(
+                              nearestParentPosition: parent.actualParent.actualPosition,
+                              targetedParentDepth: depth,
+                            );
+                          },
+                          child: Text(
+                            parent.parents[depth - 1],
+                          ),
+                        ),
+                        const Icon(
+                          Icons.arrow_forward_ios_rounded,
+                        )
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              const VerticalDividerWidget(),
+            ],
           ),
         ),
-        for (int depth = 1;
-            depth <= data.parentData!.actualParent.actualPosition.length;
-            depth++) ...[
-          TextButton(
-            onPressed: () {
-              Provider.of<TestCaseDataController>(context, listen: false)
-                  .goBack(
-                nearestParentPosition: parent.actualParent.actualPosition,
-                targetedParentDepth: depth,
-              );
-            },
-            child: Text(
-              parent.parents[depth - 1],
-            ),
-          ),
-          const Icon(
-            Icons.arrow_forward_ios_rounded,
-          )
-        ],
+        const HorizontalDividerWidget(),
       ],
     );
   }
