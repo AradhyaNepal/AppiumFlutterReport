@@ -66,10 +66,7 @@ class Report {
       forTestCase: 0,
       icon: Padding(
         padding: padding,
-        child: const Icon(
-          Icons.done,
-          color: Colors.green,
-        ),
+        child: Report.getStatusIcon(Status.success),
       ),
     ),
     TestResultData(
@@ -78,10 +75,7 @@ class Report {
       forTestCase: 0,
       icon: Padding(
         padding: padding,
-        child: const Icon(
-          Icons.close,
-          color: Colors.red,
-        ),
+        child:Report.getStatusIcon(Status.failed),
       ),
     ),
     TestResultData(
@@ -90,10 +84,7 @@ class Report {
       forTestCase: 0,
       icon: Padding(
         padding: padding,
-        child: const Icon(
-          Icons.warning_amber,
-          color: Colors.red,
-        ),
+        child:Report.getStatusIcon(Status.error),
       ),
     ),
     TestResultData(
@@ -102,10 +93,7 @@ class Report {
       forTestCase: 0,
       icon: Padding(
         padding: padding,
-        child: const Icon(
-          Icons.arrow_right_alt_sharp,
-          color: Colors.green,
-        ),
+        child: Report.getStatusIcon(Status.skipped),
       ),
     ),
     TestResultData(
@@ -114,11 +102,38 @@ class Report {
       forTestCase: 0,
       icon: Padding(
         padding: padding,
-        child: const Icon(
-          Icons.question_mark,
-          color: Colors.black,
-        ),
+        child: Report.getStatusIcon(Status.none),
       ),
     ),
   ];
+
+  static Icon getStatusIcon(Status status){
+    switch(status){
+      case Status.success:
+        return const Icon(
+          Icons.done,
+          color: Colors.green,
+        );
+      case Status.failed:
+        return const Icon(
+          Icons.close,
+          color: Colors.red,
+        );
+      case Status.error:
+        return const Icon(
+          Icons.warning_amber,
+          color: Colors.red,
+        );
+      case Status.skipped:
+        return const Icon(
+          Icons.arrow_right_alt_sharp,
+          color: Colors.green,
+        );
+      case Status.none:
+        return const Icon(
+          Icons.question_mark,
+          color: Colors.black,
+        );
+    }
+  }
 }

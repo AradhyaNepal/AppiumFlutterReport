@@ -124,7 +124,7 @@ class SingleTopBoxItem extends StatelessWidget {
         children: [
           data.icon != null
               ? SizedBox(
-                  height: isSmall(context) ? 22.sp : 8.sp,
+                  height: isSmall(context) ? 17.sp : 6.5.sp,
                   child: FittedBox(child: data.icon),
                 )
               : Icon(

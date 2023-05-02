@@ -189,7 +189,7 @@ class TestCaseDataController with ChangeNotifier {
     final children = parentActualData.children ?? [];
     for (int i = 0; i < children.length; i++) {
       ChildType childType =
-          _getChildType(i: i, familyMembersLength: children.length);
+          TestCaseDataController.getChildType(i: i, familyMembersLength: children.length);
       expandedData.add(
         TestCaseRow(
           parentData: ParentData(
@@ -209,7 +209,7 @@ class TestCaseDataController with ChangeNotifier {
     return expandedData;
   }
 
-  ChildType _getChildType({
+  static ChildType getChildType({
     required int i,
     required int familyMembersLength,
   }) {
