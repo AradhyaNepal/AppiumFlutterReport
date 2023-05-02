@@ -1,11 +1,7 @@
-import 'dart:convert';
-import 'dart:html';
 import 'package:appium_report/screens/report_details/widgets/search_widget.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:screenshot/screenshot.dart';
 import '../../common/widgets/app_bar_title_widget.dart';
 import '../../model/report.dart';
 import 'controller/test_case_data_controller.dart';
@@ -50,35 +46,6 @@ class _ReportDetailsContentState extends State<_ReportDetailsContent> {
         title: AppBarTitleWidget(
           title: "${widget.report.appName} Report",
         ),
-        actions: kIsWeb?[
-          Tooltip(
-            message: "Download File",
-            child: IconButton(
-                onPressed: ()async{
-                  setState(() {
-                    forDownload=true;
-                  });
-                  Provider.of<TestCaseDataController>(context,listen: false).renderForDownloadTable();
-                  final image=await screenshotController.capture();
-                  if(image==null)return;
-                  final content = base64Encode(image);
-                  AnchorElement(
-                      href: "data:application/octet-stream;charset=utf-16le;base64,$content")
-                    ..setAttribute("download", "file.png")
-                    ..click();
-                  if(!mounted)return;
-                  Provider.of<TestCaseDataController>(context,listen: false).renderOptimizedTable();
-                  setState(() {
-                    forDownload=false;
-                  });
-                },
-                icon: const Icon(
-                  Icons.download,
-                )
-            ),
-          ),
-          SizedBox(width: 5.w,),
-        ]:null,
       ),
       body: Container(
         height: size.height,
@@ -87,7 +54,6 @@ class _ReportDetailsContentState extends State<_ReportDetailsContent> {
           horizontal: 10.w,
         ),
         child: CustomScrollView(
-          shrinkWrap: forDownload,
           physics: const BouncingScrollPhysics(),
           slivers: [
             SliverList(
