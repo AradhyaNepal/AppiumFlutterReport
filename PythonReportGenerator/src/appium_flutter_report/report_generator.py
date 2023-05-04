@@ -1,5 +1,5 @@
 from datetime import datetime
-from src.appium_flutter_report.test_case import TestCaseData
+from .test_case import TestCaseData
 import json
 from appium import webdriver
 

@@ -1,6 +1,6 @@
-from src.appium_flutter_report.report_generator import FlutterReportGenerator
-from src.appium_flutter_report.test_case import TestCaseData, Status
-from src.appium_flutter_report.logger import Logger
+from .report_generator import FlutterReportGenerator
+from .test_case import TestCaseData, Status
+from .logger import Logger
 import traceback
 
 

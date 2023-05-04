@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "appium_flutter_report"
-version = "0.1.3"
+version = "0.1.6"
 authors = [
   { name="Aaradhya Gopal Nepal", email="aradhya.1441@gmail.com" },
 ]

@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from group_and_test import *
-from logger import *
-from report_generator import *
-from test_case import *
+from .group_and_test import *
+from .logger import *
+from .report_generator import *
+from .test_case import *
