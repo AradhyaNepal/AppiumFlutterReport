@@ -1,4 +1,4 @@
-from model.test_case import TestCaseData
+from test_case import TestCaseData
 
 
 # Logger is available to user. It ensure that user can add details to TestCaseData's Object
@@ -12,3 +12,4 @@ class Logger:
 
     def add_screenshot(self, screenshot: str):
         self.__privateData.add_screenshot(screenshot)
+
