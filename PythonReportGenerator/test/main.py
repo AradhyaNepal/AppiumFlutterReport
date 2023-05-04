@@ -1,4 +1,3 @@
-from src.__init__ import *
 from crud.test_crud import test_crud
 from login.test_login import test_login
 

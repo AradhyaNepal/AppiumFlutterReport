@@ -1,4 +1,4 @@
-from src.test_case import TestCaseData
+from src.appium_flutter_report.test_case import TestCaseData
 
 
 # Logger is available to user. It ensure that user can add details to TestCaseData's Object
