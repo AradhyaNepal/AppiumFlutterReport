@@ -1,5 +1,5 @@
 from datetime import datetime
-from test_case import TestCaseData
+from src.test_case import TestCaseData
 import json
 from appium import webdriver
 

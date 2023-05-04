@@ -1,4 +1,4 @@
-from imports import *
+from src.__init__ import *
 from crud.test_crud import test_crud
 from login.test_login import test_login
 
@@ -18,7 +18,7 @@ def main():
         driver=driver,
         app_name="Animation Test",
         capabilities=capabilities,
-        report_path="",
+        report_path="../Output/",  # Todo:Set Report path as per your project, for my case Output is in .gitignore
     )
     test_login()
     test_crud()

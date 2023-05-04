@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "apppium_flutter_report_generator"
+version = "0.1.2"
+authors = [
+  { name="Aaradhya Gopal Nepal", email="aradhya.1441@gmail.com" },
+]
+description = "A package for generating Appium Flutter Report."
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/AradhyaNepal/AppiumFlutterReport/tree/main/PythonReportGenerator"
+"Bug Tracker" = "https://github.com/AradhyaNepal/AppiumFlutterReport/issues"

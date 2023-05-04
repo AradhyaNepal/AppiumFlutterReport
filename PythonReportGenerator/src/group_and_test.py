@@ -1,6 +1,6 @@
-from report_generator import FlutterReportGenerator
-from test_case import TestCaseData, Status
-from logger import Logger
+from src.report_generator import FlutterReportGenerator
+from src.test_case import TestCaseData, Status
+from src.logger import Logger
 import traceback
 
 

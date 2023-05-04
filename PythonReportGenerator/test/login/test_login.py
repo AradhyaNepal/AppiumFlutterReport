@@ -1,5 +1,5 @@
-from group_and_test import group, test
-from logger import Logger
+from src.group_and_test import group, test
+from src.logger import Logger
 
 
 def test_login():
