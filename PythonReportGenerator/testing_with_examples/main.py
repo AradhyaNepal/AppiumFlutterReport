@@ -4,19 +4,20 @@ from login.test_login import test_login
 
 
 def main():
-    driver = webdriver.Remote(DriverSetup.url, DriverSetup.capabilities)
+    capabilities = dict(
+        platformName='Android',
+        automationName='flutter',
+        deviceName='emulator-5554',
+        appPackage='com.example.animation',
+        appActivity='.MainActivity',
+        language='en',
+        locale='US',
+    )
+    driver = webdriver.Remote("http://localhost:4723", capabilities)
     FlutterReportGenerator.setup(
         driver=driver,
         app_name="Animation Test",
-        capabilities=dict(
-            platformName='Android',
-            automationName='flutter',
-            deviceName='emulator-5554',
-            appPackage='com.example.animation',
-            appActivity='.MainActivity',
-            language='en',
-            locale='US',
-        ),
+        capabilities=capabilities,
         report_path="",
     )
     test_login()
