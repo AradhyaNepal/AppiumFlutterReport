@@ -8,6 +8,7 @@ class TestCaseData:
         self.test_name = test_name
         self.steps = []
         self.screenshots = []
+        self.videos = []
         self.is_group = is_group
         self.children = [] if is_group else None
         self.invalid_grouping_lock = False
@@ -26,8 +27,17 @@ class TestCaseData:
     def add_step(self, step: str):
         self.steps.append(step)
 
+    def add_error(self, error: str):
+        self.error = self.error + "\n" + error
+
+    def add_warning(self, warning: str):
+        self.warning = self.warning + "\n" + warning
+
     def add_screenshot(self, screenshot: str):
         self.screenshots.append(screenshot)
+
+    def add_video(self, video: str):
+        self.videos.append(video)
 
     @staticmethod
     def get_json_status(status: int) -> str:
@@ -76,7 +86,9 @@ class TestCaseData:
             "extraLog": self.extra_log,
             "duration": self.duration,
             "steps": self.steps,
+            "error": self.error,
             "screenshots": self.screenshots,
+            "videos": self.videos,
         }
         if self.is_group is True or self.children is not None:
             children_json = []
