@@ -1,7 +1,7 @@
 import time
 
-from src import group, test
-from src import Logger
+from src.appium_flutter_report import group, test
+from src.appium_flutter_report.logger import Logger
 
 
 def test_crud():

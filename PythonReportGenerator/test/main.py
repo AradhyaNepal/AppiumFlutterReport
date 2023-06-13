@@ -1,5 +1,7 @@
 from crud.test_crud import test_crud
 from login.test_login import test_login
+from src.appium_flutter_report import FlutterReportGenerator
+from appium import webdriver
 
 
 def main():

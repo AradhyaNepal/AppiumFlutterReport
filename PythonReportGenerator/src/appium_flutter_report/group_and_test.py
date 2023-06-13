@@ -8,7 +8,7 @@ from datetime import datetime
 
 
 def group(title: str, function_may_with_logger_as_parameter, skip: bool = False) -> bool:
-    return __create_test_case(title=title, testing=function_with_no_parameter, is_group=True,
+    return __create_test_case(title=title, testing=function_may_with_logger_as_parameter, is_group=True,
                               skip=skip)
 
 

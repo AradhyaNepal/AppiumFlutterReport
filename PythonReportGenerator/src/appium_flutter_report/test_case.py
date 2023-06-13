@@ -6,6 +6,8 @@ class TestCaseData:
         self.time: datetime = datetime.now()
         self.status = Status.NONE
         self.test_name = test_name
+        self.error = ""
+        self.warning = ""
         self.steps = []
         self.screenshots = []
         self.videos = []
