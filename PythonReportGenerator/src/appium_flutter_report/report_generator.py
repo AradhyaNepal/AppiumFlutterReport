@@ -4,6 +4,7 @@ import json
 from appium import webdriver
 import os
 
+
 class FlutterReportGenerator:
     driver: webdriver.Remote
     app_name: str
@@ -12,6 +13,7 @@ class FlutterReportGenerator:
     time: datetime
     testCaseData: list
     current_pointer: list
+    inside_test: str
 
     def __new__(cls):
         if not hasattr(cls, 'instance'):
@@ -27,6 +29,7 @@ class FlutterReportGenerator:
         FlutterReportGenerator.time = datetime.now()
         FlutterReportGenerator.testCaseData = []
         FlutterReportGenerator.current_pointer = []
+        FlutterReportGenerator.inside_test = None
 
     @staticmethod
     def generate_report():

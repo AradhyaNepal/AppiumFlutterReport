@@ -19,6 +19,13 @@ def test(title: str, function_may_with_logger_as_parameter, skip: bool = False) 
 
 # noinspection PyUnreachableCode
 def __create_test_case(title: str, testing, is_group: bool, skip: bool = False) -> bool:
+    if FlutterReportGenerator.inside_test is not None:
+        test_type = ("Group" if is_group else "Test")
+        print("WARNING: Only inside Group there could be another Test/Group.")
+        print("But " + test_type + " Named:'" + title + "' was found inside Test named: '" + str(
+            FlutterReportGenerator.inside_test) + "'.")
+        print("This " + test_type + " is completely ignored.")
+        return False
     parent_data = TestCaseData("", is_group=False)
     root_element_with_no_parent = False
     if len(FlutterReportGenerator.current_pointer) == 0:
@@ -42,18 +49,6 @@ def __create_test_case(title: str, testing, is_group: bool, skip: bool = False) 
                 temp = temp.children[index]
             parent_depth = parent_depth + 1
         parent_data: TestCaseData = temp
-        if False:
-            print("Bello")
-            # Todo: Implement Inside Test Cannot be Group or Test
-            # # Todo: Implement Skip
-            # warning = "Warning: Group or Another Test '" + title + "' :cannot Be added inside Test, Skipped all the " \
-            #                                                        "testing in " \
-            #                                                        "particular Test scope"
-            # print(warning)
-            # parent_data.test_completed(
-            #     warning,
-            #     Status.FAILED, invalid_grouping=True)
-            # # return
     test_case = TestCaseData(title, is_group=is_group)
 
     if root_element_with_no_parent:
@@ -73,6 +68,7 @@ def __create_test_case(title: str, testing, is_group: bool, skip: bool = False) 
             except TypeError:
                 testing()
         else:
+            FlutterReportGenerator.inside_test = test_case.test_name
             try:
                 testing(logger)
             except TypeError:
@@ -91,6 +87,7 @@ def __create_test_case(title: str, testing, is_group: bool, skip: bool = False) 
         logger.add_screenshot(is_error=True)
         test_case.test_completed(str(e), Status.ERROR)
         is_success = True
+    FlutterReportGenerator.inside_test = None
     logger.stop_and_save_recording(auto_stop=True)
     if is_group:
         FlutterReportGenerator.current_pointer.pop()

@@ -33,9 +33,6 @@ def correct_login(logger: Logger):
 
 
 def wrong_login(logger: Logger):
-    logger.start_recording()
-    time.sleep(5)
-    logger.stop_and_save_recording()
     logger.add_step("Username: 9800915400 Password: Wrong Password")
     logger.add_step("Login Button Pressed")
     assert True
