@@ -42,13 +42,21 @@ class FlutterReportGenerator:
         response["duration"] = str(duration.total_seconds() * 1000) + " ms"
         response["generatingReportTime"] = str(report_generation_time.total_seconds() * 1000) + " ms"
 
-        # For now no screenshots
-        file_name = FlutterReportGenerator.app_name + "_" + FlutterReportGenerator.time.strftime(
-            "%y_%m_%d_%H_%M_%S") + ".json"
-        file_name = file_name.replace(" ", "_")
-        file = open(FlutterReportGenerator.report_path + file_name, "a")
-        file.write(json.dumps(response, default=str), )
-        file.close()
+        actual_folder_location = FlutterReportGenerator.get_actual_folder_location()
+        if not os.path.exists(actual_folder_location):
+            os.makedirs(actual_folder_location)
+        actual_file_location = actual_folder_location + "/report.json"
+        with open(actual_file_location, 'a') as f:
+            f.write(json.dumps(response, default=str))
+
+    @staticmethod
+    def get_relative_folder_name() -> str:
+        return FlutterReportGenerator.app_name + "_" + FlutterReportGenerator.time.strftime(
+            "%y_%m_%d_%H_%M_%S")
+
+    @staticmethod
+    def get_actual_folder_location() -> str:
+        return FlutterReportGenerator.report_path + FlutterReportGenerator.get_relative_folder_name()
 
     @staticmethod
     def __get_result():

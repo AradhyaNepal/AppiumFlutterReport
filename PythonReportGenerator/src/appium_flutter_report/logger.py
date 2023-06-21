@@ -22,20 +22,24 @@ class Logger:
     def add_warning(self, warning: str):
         self.__privateData.add_warning(warning)
 
-    def add_screenshot(self):
-        directory = FlutterReportGenerator.report_path + 'screenshot/'
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        location = directory + "Error_" + self.__privateData.test_name.replace(
+    def add_screenshot(self, is_error: bool = False):
+        relative_folder_location = 'screenshot/'
+        actual_folder_location = FlutterReportGenerator.get_actual_folder_location() + relative_folder_location
+        if not os.path.exists(actual_folder_location):
+            os.makedirs(actual_folder_location)
+            # TODO: Error or not on naming
+        file_name = ("Error_" if is_error else "") + self.__privateData.test_name.replace(
             " ",
             "_") + "_" + datetime.now().strftime(
             "%d_%m_%Y") + ".png"
+        actual_file_location = actual_folder_location + file_name
+        relative_file_location = relative_folder_location + file_name
         driver: webdriver.Remote = FlutterReportGenerator.driver
         print("Taking Screenshot")
         image = driver.get_screenshot_as_png()
-        with open(location, 'wb') as f:
+        with open(actual_file_location, 'wb') as f:
             f.write(image)
-        self.__privateData.add_screenshot(location)
+        self.__privateData.add_screenshot(relative_file_location)
 
     def start_recording(self):
         if self.is_recording is False:
@@ -44,7 +48,7 @@ class Logger:
             driver: webdriver.Remote = FlutterReportGenerator.driver
             driver.switch_to.context("NATIVE_APP")
             driver.start_recording_screen()
-            driver.switch_to.context("FLUTTER")
+            driver.switch_to.context("FLUTTER")  # Todo: Context might already be NATIVE_APP
         else:
             print("Already recording, cannot record " + self.__privateData.test_name)
 
@@ -55,16 +59,19 @@ class Logger:
             print("Recording Stopped")
             driver.switch_to.context("NATIVE_APP")
             video = driver.stop_recording_screen()
-            driver.switch_to.context("FLUTTER")
-            directory=FlutterReportGenerator.report_path + 'video/'
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-            location = directory + self.__privateData.test_name.replace(" ",
-                                                                        "_") + "_" + datetime.now().strftime(
+            driver.switch_to.context("FLUTTER")  # Todo: Context might already be NATIVE_APP
+            relative_folder_location = 'video/'
+            actual_folder_location = FlutterReportGenerator.get_actual_folder_location() + relative_folder_location
+            if not os.path.exists(actual_folder_location):
+                os.makedirs(actual_folder_location)
+            file_name = self.__privateData.test_name.replace(" ",
+                                                             "_") + "_" + datetime.now().strftime(
                 "%H_%M_%S") + ".mp4"
-            with open(location, 'wb') as f:
+            actual_file_location = actual_folder_location + file_name
+            relative_file_location = relative_folder_location + file_name
+            with open(actual_file_location, 'wb') as f:
                 f.write(base64.b64decode(video))
-            self.__privateData.add_video(location)
+            self.__privateData.add_video(relative_file_location)
         else:
             if auto_stop:
                 return

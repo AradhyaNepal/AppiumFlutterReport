@@ -81,14 +81,14 @@ def __create_test_case(title: str, testing, is_group: bool, skip: bool = False) 
         is_success = True
     except AssertionError:
         test_case.test_completed("_", Status.FAILED)
-        logger.add_screenshot()
+        logger.add_screenshot(is_error=True)
         is_success = False
     except Exception as e:
         print(str(e))
         print(traceback.format_exc())
         logger.add_step("Got Error!: " + str(e))
         logger.add_error(traceback.format_exc())
-        logger.add_screenshot()
+        logger.add_screenshot(is_error=True)
         test_case.test_completed(str(e), Status.ERROR)
         is_success = True
     logger.stop_and_save_recording(auto_stop=True)
