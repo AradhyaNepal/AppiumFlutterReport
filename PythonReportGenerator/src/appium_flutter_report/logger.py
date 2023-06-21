@@ -23,7 +23,7 @@ class Logger:
         self.__privateData.add_warning(warning)
 
     def add_screenshot(self, is_error: bool = False):
-        relative_folder_location = 'screenshot/'
+        relative_folder_location = '/screenshot/'
         actual_folder_location = FlutterReportGenerator.get_actual_folder_location() + relative_folder_location
         if not os.path.exists(actual_folder_location):
             os.makedirs(actual_folder_location)
@@ -60,7 +60,7 @@ class Logger:
             driver.switch_to.context("NATIVE_APP")
             video = driver.stop_recording_screen()
             driver.switch_to.context("FLUTTER")  # Todo: Context might already be NATIVE_APP
-            relative_folder_location = 'video/'
+            relative_folder_location = '/video/'
             actual_folder_location = FlutterReportGenerator.get_actual_folder_location() + relative_folder_location
             if not os.path.exists(actual_folder_location):
                 os.makedirs(actual_folder_location)
