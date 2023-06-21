@@ -22,11 +22,13 @@ def group_crud():
     )
     group(
         "Update",
-        group_update
+        group_update,
+        skip=True
     )
     test(
         "Testing Delete",
         delete,
+        skip=True
     )
 
 

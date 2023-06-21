@@ -56,8 +56,8 @@ def __create_test_case(title: str, testing, is_group: bool, skip: bool = False) 
     else:
         parent_data.children.append(test_case)
     if skip:
-        test_case.test_completed("-", Status.SKIPPED)
-        return false
+        test_case.test_completed("Any sub children inside this group are ignored."if is_group else "-", Status.SKIPPED)
+        return False
     logger = Logger(test_case)
     try:
         # Run The Testing
