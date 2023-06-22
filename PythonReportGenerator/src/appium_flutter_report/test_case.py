@@ -7,21 +7,15 @@ class TestCaseData:
         self.time: datetime = datetime.now()
         self.status = Status.NONE
         self.test_name = test_name
-        self.error = ""
         self.warning = ""
         self.steps = []
         self.screenshots = []
         self.videos = []
         self.is_group = is_group
         self.children = [] if is_group else None
-        self.invalid_grouping_lock = False
-        self.extra_log = "N/A"
+        self.extra_log = "_"
 
-    def test_completed(self, extra_log: str, status: int, invalid_grouping: bool = False):
-        if self.invalid_grouping_lock is True:
-            print("Locked Protection")
-            return
-        self.invalid_grouping_lock = invalid_grouping
+    def test_completed(self, extra_log: str, status: int):
         self.extra_log = extra_log
         self.status = status
         duration = datetime.now() - self.time
@@ -29,9 +23,6 @@ class TestCaseData:
 
     def add_step(self, step: str):
         self.steps.append(step)
-
-    def add_error(self, error: str):
-        self.error = self.error + "\n" + error
 
     def add_warning(self, warning: str):
         self.warning = self.warning + "\n" + warning
@@ -89,7 +80,6 @@ class TestCaseData:
             "extraLog": self.extra_log,
             "duration": self.duration,
             "steps": self.steps,
-            "error": self.error,
             "screenshots": self.screenshots,
         }
         if self.is_group is True or self.children is not None:
@@ -102,7 +92,7 @@ class TestCaseData:
         for video in self.videos:
             video: Video = video
             video_json.append(video.to_json())
-        response["video"] = video_json
+        response["videos"] = video_json
 
         return response
 

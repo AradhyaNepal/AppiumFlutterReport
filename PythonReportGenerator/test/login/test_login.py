@@ -13,7 +13,8 @@ def test_login():
     print("Login "+str(value))
 
 
-def group_login():
+def group_login(logger:Logger):
+    logger.add_screenshot()
     value=test(
         "Wrong Login",
         wrong_login,

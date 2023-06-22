@@ -54,8 +54,8 @@ class FlutterReportGenerator:
 
     @staticmethod
     def get_relative_folder_name() -> str:
-        return FlutterReportGenerator.app_name + "_" + FlutterReportGenerator.time.strftime(
-            "%y_%m_%d_%H_%M_%S")
+        return FlutterReportGenerator.app_name.replace(" ", "") + "_" + FlutterReportGenerator.time.strftime(
+            "%y%m%d%H%M%S")
 
     @staticmethod
     def get_actual_folder_location() -> str:

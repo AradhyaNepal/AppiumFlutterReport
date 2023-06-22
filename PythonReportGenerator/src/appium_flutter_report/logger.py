@@ -17,9 +17,6 @@ class Logger:
     def add_step(self, step: str):
         self.__privateData.add_step(step)
 
-    def add_error(self, step: str):
-        self.__privateData.add_error(step)
-
     def add_warning(self, warning: str):
         self.__privateData.add_warning(warning)
 
@@ -28,8 +25,8 @@ class Logger:
         actual_folder_location = FlutterReportGenerator.get_actual_folder_location() + relative_folder_location
         file_name = ("Error_" if is_error else "") + self.__privateData.test_name.replace(
             " ",
-            "_") + "_" + datetime.now().strftime(
-            "%d_%m_%Y") + ".png"
+            "") + "_" + datetime.now().strftime(
+            "%H%M%S") + ".png"
         actual_file_location = actual_folder_location + file_name
         relative_file_location = relative_folder_location + file_name
 
@@ -37,7 +34,7 @@ class Logger:
             os.makedirs(actual_folder_location)
             # TODO: Error or not on naming
         driver: webdriver.Remote = FlutterReportGenerator.driver
-        print("Taking Screenshot")
+        print("Taking Screenshot: " + self.__privateData.test_name)
         image = driver.get_screenshot_as_png()
         with open(actual_file_location, 'wb') as f:
             f.write(image)
@@ -46,7 +43,7 @@ class Logger:
 
     def start_recording(self):
         if self.is_recording_thumbnail is None:
-            print("Recording Started: "+self.__privateData.test_name)
+            print("Recording Started: " + self.__privateData.test_name)
             driver: webdriver.Remote = FlutterReportGenerator.driver
             driver.switch_to.context("NATIVE_APP")
             driver.start_recording_screen()
@@ -60,8 +57,8 @@ class Logger:
         actual_folder_location = FlutterReportGenerator.get_actual_folder_location() + relative_folder_location
         file_name = self.__privateData.test_name.replace(
             " ",
-            "_") + "_" + datetime.now().strftime(
-            "%d_%m_%Y") + ".png"
+            "") + "_" + datetime.now().strftime(
+            "%d%m%Y") + ".png"
         actual_file_location = actual_folder_location + file_name
         relative_file_location = relative_folder_location + file_name
         image = driver.get_screenshot_as_png()
@@ -74,7 +71,7 @@ class Logger:
     def stop_and_save_recording(self, auto_stop: bool = False):
         if self.is_recording_thumbnail is not None:
             driver: webdriver.Remote = FlutterReportGenerator.driver
-            print("Recording Stopped: "+self.__privateData.test_name)
+            print("Recording Stopped: " + self.__privateData.test_name)
             driver.switch_to.context("NATIVE_APP")
             video = driver.stop_recording_screen()
             driver.switch_to.context("FLUTTER")  # Todo: Context might already be NATIVE_APP
@@ -83,8 +80,8 @@ class Logger:
             if not os.path.exists(actual_folder_location):
                 os.makedirs(actual_folder_location)
             file_name = self.__privateData.test_name.replace(" ",
-                                                             "_") + "_" + datetime.now().strftime(
-                "%H_%M_%S") + ".mp4"
+                                                             "") + "_" + datetime.now().strftime(
+                "%H%M%S") + ".mp4"
             actual_file_location = actual_folder_location + file_name
             relative_file_location = relative_folder_location + file_name
             with open(actual_file_location, 'wb') as f:

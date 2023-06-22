@@ -56,7 +56,7 @@ def __create_test_case(title: str, testing, is_group: bool, skip: bool = False) 
     else:
         parent_data.children.append(test_case)
     if skip:
-        test_case.test_completed("Any sub children inside this group are ignored."if is_group else "-", Status.SKIPPED)
+        test_case.test_completed("Any sub children inside this group are ignored." if is_group else "-", Status.SKIPPED)
         return False
     logger = Logger(test_case)
     try:
@@ -83,9 +83,8 @@ def __create_test_case(title: str, testing, is_group: bool, skip: bool = False) 
         print(str(e))
         print(traceback.format_exc())
         logger.add_step("Got Error!: " + str(e))
-        logger.add_error(traceback.format_exc())
         logger.add_screenshot(is_error=True)
-        test_case.test_completed(str(e), Status.ERROR)
+        test_case.test_completed(str(e) + "\n" + traceback.format_exc(), Status.ERROR)
         is_success = True
     FlutterReportGenerator.inside_test = None
     logger.stop_and_save_recording(auto_stop=True)
