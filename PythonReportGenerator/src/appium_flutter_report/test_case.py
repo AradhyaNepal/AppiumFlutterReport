@@ -1,4 +1,5 @@
 from datetime import datetime
+from .video import Video
 
 
 class TestCaseData:
@@ -38,7 +39,7 @@ class TestCaseData:
     def add_screenshot(self, screenshot: str):
         self.screenshots.append(screenshot)
 
-    def add_video(self, video: str):
+    def add_video(self, video: Video):
         self.videos.append(video)
 
     @staticmethod
@@ -80,7 +81,7 @@ class TestCaseData:
             return True
         return self.status is Status.SKIPPED or self.is_group is False or len(self.children) == 0
 
-    def to_json(self):
+    def to_json(self) -> dict:
         response = {
             "testName": self.test_name,
             "time": self.time,
@@ -90,14 +91,18 @@ class TestCaseData:
             "steps": self.steps,
             "error": self.error,
             "screenshots": self.screenshots,
-            "videos": self.videos,
         }
         if self.is_group is True or self.children is not None:
             children_json = []
-            for item in self.children:
-                item: TestCaseData = item
-                children_json.append(item.to_json())
+            for child in self.children:
+                child: TestCaseData = child
+                children_json.append(child.to_json())
             response["children"] = children_json
+        video_json = []
+        for video in self.videos:
+            video: Video = video
+            video_json.append(video.to_json())
+        response["video"] = video_json
 
         return response
 

@@ -24,3 +24,4 @@ from .group_and_test import *
 from .logger import *
 from .report_generator import *
 from .test_case import *
+from .video import *
