@@ -28,11 +28,13 @@ def group_crud():
     test(
         "Testing Delete",
         delete,
-        skip=True
     )
 
 
 def read(logger: Logger):
+    logger.start_recording()
+    time.sleep(2)
+    logger.stop_and_save_recording()
     group(
         "Delete: Must Throw test must not be inside test",
         delete2,
@@ -43,6 +45,9 @@ def read(logger: Logger):
 
 
 def delete(logger: Logger):
+    logger.start_recording()
+    time.sleep(2)
+    logger.stop_and_save_recording()
     logger.add_step("Delete Button Was Pressed")
     logger.add_step("Confirm To Delete Was Pressed")
     assert True

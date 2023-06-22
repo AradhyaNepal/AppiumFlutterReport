@@ -46,16 +46,16 @@ class Logger:
 
     def start_recording(self):
         if self.is_recording_thumbnail is None:
-            print("Recording Started")
+            print("Recording Started: "+self.__privateData.test_name)
             driver: webdriver.Remote = FlutterReportGenerator.driver
             driver.switch_to.context("NATIVE_APP")
             driver.start_recording_screen()
             driver.switch_to.context("FLUTTER")  # Todo: Context might already be NATIVE_APP
-            self.is_recording_thumbnail = __add_video_thumbnail()
+            self.is_recording_thumbnail = self.__add_video_thumbnail(driver)
         else:
             print("Already recording, cannot record " + self.__privateData.test_name)
 
-    def __add_video_thumbnail(self) -> str:
+    def __add_video_thumbnail(self, driver: webdriver.Remote) -> str:
         relative_folder_location = '/video/thumbnail/'
         actual_folder_location = FlutterReportGenerator.get_actual_folder_location() + relative_folder_location
         file_name = self.__privateData.test_name.replace(
@@ -74,7 +74,7 @@ class Logger:
     def stop_and_save_recording(self, auto_stop: bool = False):
         if self.is_recording_thumbnail is not None:
             driver: webdriver.Remote = FlutterReportGenerator.driver
-            print("Recording Stopped")
+            print("Recording Stopped: "+self.__privateData.test_name)
             driver.switch_to.context("NATIVE_APP")
             video = driver.stop_recording_screen()
             driver.switch_to.context("FLUTTER")  # Todo: Context might already be NATIVE_APP
